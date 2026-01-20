@@ -17,12 +17,6 @@ def clean_name(name):
     name = re.sub(r"\b(dr|prog)\.?\b", "", name, flags=re.IGNORECASE)
     return name.strip().title()
 
-def extract_phd_field(text):
-    if not isinstance(text, str):
-        return ""
-    match = re.search(r"\((.*?)\)", text)
-    return match.group(1).strip() if match else text.strip()
-
 def validate_email(email):
     if isinstance(email, str):
         email = email.strip().lower()
@@ -31,7 +25,7 @@ def validate_email(email):
 
 def specialization_text_to_list(text):
     if not isinstance(text, str):
-        return []
+        return ["not_available"]
     return [a.strip().lower() for a in text.split(",")]
 
 def combine_texts(bio, research, specialization, phd_field):
@@ -51,88 +45,47 @@ def combine_texts(bio, research, specialization, phd_field):
 def normalize_research(research):
     if isinstance(research, str) and research.strip():
         return clean_text(research).lower()
-    return ""
+    return "not_available"
 
-def infer_research_from_other_fields(bio, specialization):
-    signals = []
-    if isinstance(bio, str):
-        signals.append(bio)
-    if isinstance(specialization, str):
-        signals.append(specialization)
-    elif isinstance(specialization, list):
-        signals.extend(specialization)
-    return clean_text(" ".join(signals)).lower()
+import re
+import unicodedata
 
-def resolved_research(research, bio, specialization):
-    normalized_research = normalize_research(research)
-    if normalized_research:
-        return normalized_research
-    return infer_research_from_other_fields(bio, specialization)
+def clean_publication(text: str) -> str:
+    if not isinstance(text, str):
+        return None
 
-def clean_publications(text):
-    """
-    Cleans and normalizes publication text into a structured list of publications.
-    """
-    if not isinstance(text, str) or not text.strip():
-        return []
+    # Normalize unicode (fixes Â, Ã, etc.)
+    text = unicodedata.normalize("NFKD", text)
 
-    # 1. Remove HTML tags
-    text = re.sub(r"<.*?>", " ", text)
+    # Remove trademark, copyright, registered symbols
+    text = re.sub(r"[™®©]", "", text)
 
-    # 2. Normalize separators (•, |, ;, newline → ||)
-    text = re.sub(r"[•|;\n]+", "||", text)
+    # Remove pound, hash, special currency symbols
+    text = re.sub(r"[£€¥₹#]", "", text)
 
-    # 3. Remove URLs and DOIs
-    text = re.sub(r"https?://\S+", "", text)
-    text = re.sub(r"\bdoi:\S+", "", text, flags=re.IGNORECASE)
+    # Remove LaTeX commands
+    text = re.sub(r"\\[a-zA-Z]+(\{.*?\})?", "", text)
 
-    # 4. Remove excessive punctuation
-    text = re.sub(r"[^\w\s(),.-]", " ", text)
+    # Remove URLs
+    text = re.sub(r"http\S+|www\S+", "", text)
 
-    # 5. Normalize whitespace
+    # Remove non-printable & control characters
+    text = re.sub(r"[\x00-\x1f\x7f-\x9f]", " ", text)
+
+    # Replace bullets and long dashes
+    text = re.sub(r"[•▪–—]", " ", text)
+
+    # Keep only meaningful characters
+    text = re.sub(r"[^a-zA-Z0-9.,;:()\- ]", " ", text)
+
+    # Normalize whitespace
     text = re.sub(r"\s+", " ", text).strip()
 
-    # 6. Split into individual publications
-    publications = [p.strip() for p in text.split("||") if len(p.strip()) > 20]
+    return text
 
-    cleaned_publications = []
-    seen = set()
 
-    for pub in publications:
-        pub_lower = pub.lower()
 
-        # 7. Remove year-only or noise entries
-        if re.fullmatch(r"\(?\d{4}\)?", pub_lower):
-            continue
 
-        # 8. De-duplicate using normalized signature
-        signature = re.sub(r"\d{4}", "", pub_lower)
-        signature = re.sub(r"\W+", "", signature)
-
-        if signature not in seen:
-            seen.add(signature)
-            cleaned_publications.append(pub)
-
-    return cleaned_publications
-
-def extract_paper_topics(citation_list):
-    topics = []
-    for citation in citation_list:
-        # Split by commas first (authors are usually before the first comma)
-        parts = citation.split(",")
-        
-        if len(parts) > 1:
-            # The topic usually starts after the author list
-            # Find the segment that looks like a title (before journal names like Springer, IEEE, etc.)
-            for segment in parts[1:]:
-                seg = segment.strip()
-                # Heuristic: skip if segment contains journal/publisher keywords
-                if not re.search(r"(Springer|IEEE|IETE|Journal|World Scientific|Taylor Francis|Circuits|Devices|Systems|Review|Processing)", seg, re.I):
-                    topics.append(seg)
-                    break
-        else:
-            topics.append(citation.strip())
-    return topics
 
 
 

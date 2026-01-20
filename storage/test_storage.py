@@ -55,7 +55,7 @@ def run_pipeline():
         print("inserting to the database from cleaned data")
 
         seeder = Data_insertion(db_path="data/database/faculty.db")
-        seeder.insert_data("data/cleaned/dau_faculty_final.csv")
+        seeder.insert_data("data/cleaned/transformed_faculty_data.csv")
 
         print("Database seeding completed successfully")
 

@@ -21,7 +21,7 @@ os.environ.setdefault(
 from ingestion.daiict_faculty.spiders.daufaculty import DaiictFacultySpider
 
 
-def run():
+def run_scraping_pipeline():
     # Ensure output directory exists
     os.makedirs("data/raw", exist_ok=True)
 
@@ -30,7 +30,4 @@ def run():
 
     process.crawl(DaiictFacultySpider)
     process.start()
-
-
-if __name__ == "__main__":
-    run()
+    print("Scraping complete. Data saved to data/raw/Faculty_DAIICT.csv")
