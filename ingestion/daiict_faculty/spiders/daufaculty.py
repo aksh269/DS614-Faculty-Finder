@@ -11,7 +11,7 @@ class DaiictFacultySpider(scrapy.Spider):
         "https://www.daiict.ac.in/adjunct-faculty",
         "https://www.daiict.ac.in/adjunct-faculty-international",
         "https://www.daiict.ac.in/distinguished-professor",
-        "https://www.daiict.ac.in/professor-of-practice"
+        "https://www.daiict.ac.in/professor-practice"
     ]
 
     def clean(self, s):

@@ -8,7 +8,7 @@ router =APIRouter()
 DB_PATH="data/database/faculty.db"
 
 @router.get("/faculty")# to get all faculty records
-def get_all_faculty_details(limit: int = Query(100,le=500)):
+def get_all_faculty_details():
   db=SqlConnectionManager(DB_PATH)
   conn=None
   try:
@@ -25,8 +25,7 @@ def get_all_faculty_details(limit: int = Query(100,le=500)):
                 research,
                 publications
          FROM faculty
-         LIMIT ?
-            """,(limit,)
+            """
     )
     output_resultset=cursor.fetchall()
     results=[
