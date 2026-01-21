@@ -4,46 +4,26 @@
 
 # Project Overview
 
-Faculty Finder is a data engineering project that automates the entire process of collecting, cleaning, storing, and serving faculty information from the DA-IICT website. Instead of manually browsing multiple pages, the system converts scattered and unstructured faculty details such as bio, research interests, and publications into a clean, structured, and searchable format.
-
-The project implements a complete data pipeline that includes web scraping, data transformation, database storage, and API-based data access. The processed data is stored in a SQLite database and exposed through a FastAPI REST API in JSON format, making it easy to use for analytics, machine learning, or future semantic search applications. The focus of this project is on building a reliable, modular, and real-world data pipeline that reflects how data engineering systems are designed in practice.
+**Faculty Finder** is a data engineering project that automates the process of collecting, cleaning, storing, and serving faculty information from the DA-IICT website, transforming scattered and unstructured details such as bio, research interests, and publications into a clean and searchable dataset. The project follows a complete data pipeline from web scraping and data transformation to database storage and API-based access, where the processed data is stored in a SQLite database and exposed through a FastAPI REST API in JSON format, making it suitable for analytics, machine learning, and future semantic search applications.
 
 ---
 
 # Problem Statement
 
-Faculty information on university websites is often spread across multiple pages and presented in inconsistent formats, which makes it difficult to search, analyze, or reuse the data effectively. Basic keyword searches are limited and do not capture the actual research expertise or interests of faculty members.
-
-The goal of this project is to build a system that can automatically extract faculty data, clean and standardize it, and store it in a structured form that supports efficient querying and future intelligent search. The system is designed to handle common real-world challenges such as missing information, noisy text, and inconsistent web structures, while providing easy access to the data through a RESTful API for researchers and data-driven applications.
+Faculty information on university websites is often scattered across multiple pages and presented in inconsistent formats, making it difficult to search, analyze, or reuse effectively. This project aims to solve that problem by automatically extracting faculty data, cleaning and standardizing it, and storing it in a structured format that supports efficient querying and future intelligent search, while handling real-world issues such as missing information, noisy text, and inconsistent web structures, and providing easy access through a RESTful API.
 
 ---
 
 # Tech Stack
-
-### Programming Language
-- **Python** – Core language used for building the data pipeline, transformations, and API
-
-### Data Ingestion
-- **Scrapy** – Used for web scraping and crawling faculty profile pages
-
-### Data Transformation
-- **Pandas** – Data cleaning, normalization, and CSV processing  
-- **Regular Expressions (re)** – Text cleaning and pattern-based normalization
-
-### Data Storage
-- **SQLite3** – Lightweight relational database for persistent storage of faculty data
-
-### API & Serving
-- **FastAPI** – REST API framework used to serve faculty data in JSON format  
-- **Uvicorn** – ASGI server used to run the FastAPI application
-
-### Configuration & Utilities
-- **Python Logging** – Centralized logging for pipeline execution and error handling  
-- **Pathlib / OS** – File system and path management
-
-### Development Environment
-- **Virtual Environment (venv)** – Dependency isolation and environment management  
-- **Git & GitHub** – Version control and project collaboration
+| Category | Tools / Technologies | Purpose |
+|--------|---------------------|---------|
+| Programming Language | Python | Core language for pipeline, transformations, and API |
+| Data Ingestion | Scrapy | Web scraping and crawling faculty profiles |
+| Data Transformation | Pandas, Regular Expressions (re) | Data cleaning, normalization, and text processing |
+| Data Storage | SQLite3 | Lightweight relational database for persistence |
+| API & Serving | FastAPI, Uvicorn | Serving faculty data as JSON via REST API |
+| Configuration & Utilities | Python Logging, Pathlib / OS | Logging, error handling, and path management |
+| Development Environment | Virtual Environment (venv), Git, GitHub | Dependency isolation and version control |
 
 ---
 
@@ -102,59 +82,31 @@ The project implements a complete and automated data pipeline that processes fac
 
 ### 1. Ingestion
 
-The ingestion stage is responsible for collecting raw faculty data from the official DA-IICT website. This step is implemented using **Scrapy**, which crawls multiple faculty listing pages and extracts individual faculty profile information.
+The ingestion stage collects raw faculty data from the official DA-IICT website using **Scrapy**. It crawls faculty and adjunct faculty pages, extracts profile-level details such as name, bio, research interests, and publications, handles missing fields and malformed HTML safely, and stores the scraped data as a raw CSV file. 
 
-Key responsibilities:
-- Crawling faculty and adjunct faculty pages
-- Extracting profile-level data such as name, biography, research interests, and publications
-- Handling missing fields and malformed HTML structures
-- Safely storing the scraped data as a raw CSV file
-
-**Output:**  
-`data/raw/Faculty_DAIICT.csv`
+**Output:** `data/raw/Faculty_DAIICT.csv`
 
 
 
 ### 2. Transformation
 
-The transformation stage cleans and standardizes the raw scraped data to ensure consistency and usability. This step focuses on removing noise, normalizing text fields, and preparing the data for storage and downstream analysis.
+The transformation stage cleans and standardizes the raw scraped data to ensure consistency and usability. It removes noise, normalizes text fields, and prepares the data for storage and downstream analysis by cleaning HTML tags and unwanted characters, normalizing faculty names and email addresses, standardizing research and specialization fields, generating unique faculty identifiers, and creating a `combined_text` field for NLP and semantic search use cases.  
 
-Key responsibilities:
-- Cleaning HTML tags and unwanted characters
-- Normalizing faculty names and email addresses
-- Standardizing research and specialization fields
-- Generating unique faculty identifiers
-- Creating a `combined_text` field for NLP and semantic search use cases
-
-**Output:**  
-`data/cleaned/transformed_faculty_data.csv`
+**Output:** `data/cleaned/transformed_faculty_data.csv`
 
 
 
 ### 3. Storage
 
-The storage stage persists the cleaned data in a relational database for efficient querying and long-term storage. A **SQLite** database is used due to its simplicity and suitability for lightweight data engineering workflows.
+The storage stage persists the cleaned data in a relational database for efficient querying and long-term storage. A **SQLite** database is used due to its simplicity and suitability for lightweight data engineering workflows. This stage creates database tables if they do not exist, validates required fields before insertion, inserts cleaned faculty records into the database, and ensures transactional safety with rollback on failure.  
 
-Key responsibilities:
-- Creating database tables if they do not exist
-- Validating required fields before insertion
-- Inserting cleaned faculty records into the database
-- Ensuring transactional safety and rollback on failure
-
-**Database:**  
-`data/database/faculty.db`
+**Database:** `data/database/faculty.db`
 
 
 
 ### 4. Serving (API)
 
-The serving stage exposes the stored faculty data through a **FastAPI-based REST API**. This allows external applications, data scientists, or search systems to access the data in a structured and scalable manner.
-
-Key responsibilities:
-- Providing REST endpoints to fetch all faculty records
-- Supporting retrieval of individual faculty records by ID
-- Returning responses in JSON format
-- Enabling easy integration with analytics, ML models, or frontend systems
+The serving stage exposes the stored faculty data through a **FastAPI-based REST API**, allowing external applications, data scientists, or search systems to access the data in a structured and scalable manner. It provides REST endpoints to fetch all faculty records or retrieve individual faculty records by ID, returns responses in JSON format, and enables easy integration with analytics workflows, machine learning models, and frontend systems.
 
 ---
 
