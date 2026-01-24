@@ -1,3 +1,7 @@
+'''
+Module defining API routes for faculty data retrieval.
+'''
+
 import sqlite3
 from fastapi import APIRouter, HTTPException,Query
 from typing import List, Optional
