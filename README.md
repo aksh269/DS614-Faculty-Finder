@@ -187,6 +187,12 @@ This spider crawls official DAU (formerly DA-IICT) faculty pages and extracts in
 
 This raw file is intentionally preserved so that the original data source can always be inspected or reprocessed if needed.
 
+Along with the unified end-to-end pipeline, each stage can also be executed independently for testing or debugging. All commands should be run from the project root directory.
+
+- **Ingestion (Scraping Only):**  
+  `python ingestion/run_scrapper.py`  
+  This fetches faculty data from the website and generates `data/raw/Faculty_DAIICT.csv`.
+
 
 
 ### Step 4: Transformation Module (Data Cleaning)
@@ -199,6 +205,11 @@ This module reads the raw CSV file from `data/raw/Faculty_DAIICT.csv` and perfor
 The cleaned output is written to:
 
 `data/cleaned/transformed_faculty_data.csv`
+
+For Running the pipeline independently. 
+- **Transformation Only:**  
+  `python -m transformation.transform_pipeline`  
+  This cleans and normalizes the raw data and creates `data/cleaned/transformed_faculty_data.csv`.
 
 
 
@@ -217,6 +228,10 @@ If the database or required tables do not exist, they are created automatically.
 
 Each record is inserted safely, and any problematic rows are logged without stopping the entire insertion process.
 
+For Running the pipeline independently. 
+- **Database Insertion Only:**  
+  `python -m storage.database_insertion`  
+  This inserts the transformed data into the SQLite database at `data/database/faculty.db`.
 
 
 ### Step 6: Running the Final Unified Pipeline
@@ -231,6 +246,9 @@ When this file is executed, it sequentially runs:
 
 This ensures a clean and reproducible execution flow. Logs generated during execution are stored in the `logs/` directory for transparency and debugging.
 
+- **Complete Unified Pipeline:**  
+  `python -m scripts`  
+  This runs ingestion, transformation, and database insertion sequentially in a single execution.
 
 
 ### Step 7: Serving the Data Through the API
@@ -244,28 +262,6 @@ To view all faculty records, the user can append `/faculty` to the base URL afte
 
 ### Step 8: Final Outcome
 At the end of execution, the project delivers a complete and traceable data system: raw data is preserved, cleaned data is structured, the database ensures persistence, and the API provides controlled access. The modular design ensures that each step is transparent, testable, and easy to verify for anyone reviewing the project.
-
-
-
-### Running Individual Pipeline Components (Optional)
-
-Along with the unified end-to-end pipeline, each stage can also be executed independently for testing or debugging. All commands should be run from the project root directory.
-
-- **Ingestion (Scraping Only):**  
-  `python ingestion/run_scrapper.py`  
-  This fetches faculty data from the website and generates `data/raw/Faculty_DAIICT.csv`.
-
-- **Transformation Only:**  
-  `python -m transformation.transform_pipeline`  
-  This cleans and normalizes the raw data and creates `data/cleaned/transformed_faculty_data.csv`.
-
-- **Database Insertion Only:**  
-  `python -m storage.database_insertion`  
-  This inserts the transformed data into the SQLite database at `data/database/faculty.db`.
-
-- **Complete Unified Pipeline:**  
-  `python -m scripts`  
-  This runs ingestion, transformation, and database insertion sequentially in a single execution.
 
 ---
 
