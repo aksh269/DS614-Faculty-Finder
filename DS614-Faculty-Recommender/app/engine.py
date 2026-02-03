@@ -4,11 +4,10 @@ from recommender.preprocessing import preprocess
 from recommender.vectorizer import compute_tf, compute_tfidf
 from recommender.similarity import cosine
 from recommender.query_parser import parse_query
+from config.settings import INDEX_FILE
 
-# load index at startup
-with open("index/vectors.pkl", "rb") as f:
+with open(INDEX_FILE, "rb") as f:
     VECTORS, META, IDF = pickle.load(f)
-
 
 def search(query: str):
 
