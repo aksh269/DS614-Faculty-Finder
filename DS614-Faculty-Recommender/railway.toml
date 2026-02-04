@@ -3,5 +3,5 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "streamlit run UI/streamlit_app.py --server.port ${PORT} --server.address 0.0.0.0"
+startCommand = "streamlit run UI/streamlit_app.py --server.port $PORT --server.address 0.0.0.0"
 restartPolicyType = "on_failure"
