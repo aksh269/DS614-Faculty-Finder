@@ -1,0 +1,11 @@
+{
+    "$schema": "https://railway.app/railway.schema.json",
+    "build": {
+        "builder": "DOCKER",
+        "dockerfilePath": "DS614-Faculty-Recommender/Dockerfile",
+        "context": "."
+    },
+    "deploy": {
+        "startCommand": "streamlit run UI/streamlit_app.py --server.port ${PORT} --server.address 0.0.0.0"
+    }
+}
