@@ -67,6 +67,37 @@ The application is deployed on Railway and is accessible publicly for demonstrat
 
 ---
 
+## Application Screenshots
+
+The following screenshots demonstrate the Faculty Finder application in action:
+
+````carousel
+### 🏠 Home Page - Search Interface
+![Home page showing the DAIICT Faculty Finder search interface with display settings and smart search tips](./Screenshots/SS 1.png)
+
+<!-- slide -->
+
+### 🔍 Search Example: Speech Recognition
+![Search results for "speech recognition" query showing 3 matching faculty members with match scores](./Screenshots/SS 2.png)
+
+<!-- slide -->
+
+### 📊 Faculty Results with Match Scores
+![Detailed faculty profiles showing research interests, courses, and relevance scores](./Screenshots/SS 3.png)
+
+<!-- slide -->
+
+### 💡 Search Example: NLP
+![Search results for "NLP" showing 5 matching faculty members with their expertise areas](./Screenshots/SS 4.png)
+
+<!-- slide -->
+
+### 🎯 Ranked Results Display
+![Faculty search results ranked by cosine similarity scores with detailed research interests](./Screenshots/SS 5.png)
+````
+
+---
+
 ## Team
 
 **Team Name:** The Data Engineers
