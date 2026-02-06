@@ -8,7 +8,7 @@ The **Faculty Recommender System** is an intelligent search engine designed to h
 
 The system powers the search functionality for the Faculty Finder project, providing a semantic-aware mechanism to query faculty data scraped from the university website. It is deployed as a web application using **Streamlit** for the frontend and a custom-built Python engine for recommendation logic.
 
-**Live Deployment:** [https://ds614-faculty-finder-production.up.railway.app](https://ds614-faculty-finder-production.up.railway.app)
+**Live Deployment:** *Pending Deployment*
 
 ---
 
@@ -172,6 +172,7 @@ This project is configured for continuous deployment.
 4. Select your forked repository.
 5. Railway will automatically detect the `Dockerfile` and `railway.toml` config.
 6. Click **Deploy**.
+7. Once successfully deployed, Railway will generate a production URL for your app (e.g., `https://web-production-xxxx.up.railway.app`).
 
 ### Option 2: Manual Deployment via CLI
 If you prefer identifying issues before pushing:
@@ -180,7 +181,7 @@ If you prefer identifying issues before pushing:
 3. Initialize project: `railway init`
 4. Upload and deploy: `railway up`
 
-**Production URL:** [https://ds614-faculty-finder-production.up.railway.app](https://ds614-faculty-finder-production.up.railway.app)
+**Production URL:** [Your Railway App URL will appear here after deployment]
 
 ---
 
