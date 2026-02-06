@@ -43,7 +43,10 @@ cd DS614-Faculty-Recommender
 docker build -t faculty-app .
 docker run -p 8080:8080 faculty-app
 ```
-
+Click on the link: 
+```bash
+Local URL: [http://localhost:8080]
+```
 ---
 
 ## Recommendation Algorithm
@@ -64,8 +67,40 @@ The application is deployed on Railway and is accessible publicly for demonstrat
 
 ---
 
+## Application Screenshots
+
+The following screenshots demonstrate the Faculty Finder application in action:
+
+### 🏠 Home Page - Search Interface
+![Home page showing the DAIICT Faculty Finder search interface with display settings and smart search tips](./Screenshots/SS%201.png)
+
+### 🔍 Search Example: Speech Recognition
+![Search results for "speech recognition" query showing 3 matching faculty members with match scores](./Screenshots/SS%202.png)
+
+### 📊 Faculty Results with Match Scores
+![Detailed faculty profiles showing research interests, courses, and relevance scores](./Screenshots/SS%203.png)
+
+### 💡 Search Example: NLP
+![Search results for "NLP" showing 5 matching faculty members with their expertise areas](./Screenshots/SS%204.png)
+
+### 🎯 Ranked Results Display
+![Faculty search results ranked by cosine similarity scores with detailed research interests](./Screenshots/SS%205.png)
+
+---
+
 ## Team
 
-**Team Name:** The Data Engineers
-- **Sanjana Nathani** (ID: 202518002)
-- **Aksh Patel** (ID: 202518046)
+👩‍💻 **Sanjana Nathani**
+- **Student ID:** 202518002  
+- **Program:** M.Sc. Data Science  
+- **Institution:** Dhirubhai Ambani University (DAU), Gandhinagar  
+- **Role in Project:** Data Engineer  
+
+👨‍💻 **Aksh Patel**  
+- **Student ID:** 202518046  
+- **Program:** M.Sc. Data Science  
+- **Institution:** Dhirubhai Ambani University (DAU), Gandhinagar  
+- **Role in Project:** Data Engineer  
+
+---
+*This recommender system is part of the larger DS614 Faculty Finder project, demonstrating the end-to-end application of Big Data Engineering principles.*

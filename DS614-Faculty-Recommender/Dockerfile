@@ -9,16 +9,15 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python deps
-COPY requirements.txt .
+COPY DS614-Faculty-Recommender/requirements.txt .
 RUN python -m pip install --upgrade pip && \
     python -m pip install --no-cache-dir -r requirements.txt
 
 # Copy entire project
-COPY . .
+COPY DS614-Faculty-Recommender/ .
 
-# Expose default port (Railway will override this via the PORT env var)
-EXPOSE 8080
+# Expose Streamlit port
+EXPOSE 8501
 
-# The default command will start the Streamlit app.
-# For Railway, you can create two services and override the start command for each.
-CMD ["sh", "-c", "streamlit run UI/streamlit_app.py --server.port ${PORT:-8080} --server.address 0.0.0.0"]
+# Run only Streamlit with dynamic PORT support for Railway
+CMD streamlit run UI/streamlit_app.py --server.port ${PORT:-8501} --server.address 0.0.0.0 --server.headless true

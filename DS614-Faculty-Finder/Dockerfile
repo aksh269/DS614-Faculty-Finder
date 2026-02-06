@@ -1,0 +1,18 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Copy requirements and install dependencies
+COPY DS614-Faculty-Finder/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY DS614-Faculty-Finder/ .
+
+# Expose port
+EXPOSE 8000
+
+# Run the FastAPI application
+# Use PORT environment variable from Railway, fallback to 8000 for local development
+CMD uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}
+
