@@ -1,6 +1,7 @@
 import re
+from config.settings import STOPWORDS_PATH
 
-def load_stopwords(path="data/stopwords.txt"):
+def load_stopwords(path=STOPWORDS_PATH):
     with open(path) as f:
         return set(w.strip() for w in f)
 
