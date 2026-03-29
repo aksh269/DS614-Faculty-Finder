@@ -1,6 +1,6 @@
 # DS614 - Big Data Engineering Project: Faculty Finder & Recommender
 
-**Live Deployment:** [https://ds614-faculty-finder-production.up.railway.app](https://ds614-faculty-finder-production.up.railway.app)
+**Live Deployment:** [https://ds614-faculty-finder-the-data-engineers.streamlit.app](https://ds614-faculty-finder-the-data-engineers.streamlit.app)
 
 ---
 

@@ -8,7 +8,7 @@ The **Faculty Recommender System** is an intelligent search engine designed to h
 
 The system powers the search functionality for the Faculty Finder project, providing a semantic-aware mechanism to query faculty data scraped from the university website. It is deployed as a web application using **Streamlit** for the frontend and a custom-built Python engine for recommendation logic.
 
-**Live Deployment:** [https://ds614-faculty-finder-production.up.railway.app](https://ds614-faculty-finder-production.up.railway.app)
+**Live Deployment:** [https://ds614-faculty-finder-the-data-engineers.streamlit.app](https://ds614-faculty-finder-the-data-engineers.streamlit.app)
 
 ---
 
