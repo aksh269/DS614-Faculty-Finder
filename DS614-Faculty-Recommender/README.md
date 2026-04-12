@@ -1,12 +1,12 @@
-# DS614 (Big Data Engineering) - Faculty Recommender System
+# ScholarMatch — AI-Powered Faculty Recommender System
 
 ---
 
 # Project Overview
 
-The **Faculty Recommender System** is an intelligent search engine designed to help students and researchers find relevant faculty members based on their research interests. Unlike simple keyword matching, this system uses a **Vector Space Model (VSM)** with **TF-IDF weighting** and **Cosine Similarity** to rank faculty profiles by relevance.
+**ScholarMatch** is an intelligent search engine designed to help students and researchers find relevant faculty members based on their research interests with high precision. Unlike simple keyword matching, this system uses a **Hybrid AI Approach** combining traditional **TF-IDF Vector Space Models** with modern **BERT Sentence Embeddings** and **Vector Databases (FAISS)**.
 
-The system powers the search functionality for the Faculty Finder project, providing a semantic-aware mechanism to query faculty data scraped from the university website. It is deployed as a web application using **Streamlit** for the frontend and a custom-built Python engine for recommendation logic.
+The system is further enhanced by a **Generative AI Layer (Google Gemini)** that understands natural language queries, expands them into technical keywords, and provides human-like explanations for each recommendation. It is deployed as a high-performance web application using **Streamlit**.
 
 **Live Deployment:** [https://ds614-faculty-finder-the-data-engineers.streamlit.app](https://ds614-faculty-finder-the-data-engineers.streamlit.app)
 
@@ -16,218 +16,139 @@ The system powers the search functionality for the Faculty Finder project, provi
 
 | Category | Tools / Technologies | Purpose |
 |--------|---------------------|---------|
-| Programming Language | Python 3.10 | Core logic for preprocessing and recommendation |
-| Frontend Framework | Streamlit | Interactive web UI for searching and displaying results |
-| Algorithm | Custom TF-IDF & Cosine Similarity | Ranking faculty based on query relevance |
-| Data Structure | In-Memory Inverted Index | Efficient retrieval of pre-computed vectors |
-| Containerization | Docker | Containerizing the application for deployment |
-| Deployment | Railway | Hosting the production application |
+| Programming Language | Python 3.10 | Core logic and AI pipeline |
+| Deep Learning | Sentence-Transformers (BERT) | Semantic understanding of research themes |
+| Vector Database | FAISS (Facebook AI) | High-speed similarity search across high-dimensional vectors |
+| Generative AI | Google Gemini Pro | Query expansion and natural language result explanation |
+| Frontend Framework | Streamlit | Interactive web UI with real-time AI insights |
+| Containerization | Docker | Reproducible deployment and orchestration |
 
 ---
 
 # Recommendation Algorithm
 
-The core of this project is a custom implementation of an Information Retrieval (IR) system. It does not rely on "black box" libraries for the core logic but instead implements the mathematical foundations of text similarity from scratch.
+ScholarMatch implements a multi-layered information retrieval system that leverages both statistical keyword analysis and deep learning semantic understanding.
 
 ### 1. Preprocessing (`recommender/preprocessing.py`)
-Raw text from faculty profiles (bio, research interests, publications) is processed to normalize the input:
-- **Case Normalization**: All text is converted to lowercase.
-- **Phrase Merging**: Domain-specific terms like "computer vision" or "deep learning" are merged into single tokens (e.g., `computer_vision`) to preserve semantic meaning.
-- **Cleaning**: Special characters and non-alphabetic tokens are removed.
-- **Stopword Removal**: Common English words (and custom stopwords) are filtered out to focus on meaningful keywords.
+Raw text is transformed into a normalized format suitable for AI processing:
+- **Phrase Merging**: Domain-specific terms like "Deep Learning" are merged into single tokens (e.g., `deep_learning`) to ensure they are treated as unique concept units.
+- **Cleaning & Filtering**: Stopwords are removed, and text is cleaned of noise to focus on core research expertise.
 
-### 2. Vectorization (TF-IDF) (`recommender/vectorizer.py`)
-The system converts text into numerical vectors using **Term Frequency - Inverse Document Frequency (TF-IDF)**.
+### 2. Hybrid Vectorization (`recommender/vectorizer.py` & `recommender/embedder.py`)
+The system creates two distinct representations for every faculty profile:
 
-#### **Term Frequency (TF)**
-Measures how frequently a term appears in a document relative to the document's length.
+#### **A. Statistical Signal (TF-IDF)**
+Calculates the relative importance of keywords using the formula:
+$$ \text{TF-IDF}(t, d) = \frac{f(t,d)}{|d|} \times \log\left(\frac{N + 1}{DF(t) + 1}\right) + 1 $$
+This ensures rare technical terms have a higher impact on search results.
 
-```
-TF(t, d) = f(t,d) / |d|
-```
-
-**Where:**
-- `t` = term (word/token)
-- `d` = document (faculty profile)
-- `f(t,d)` = frequency of term *t* in document *d*
-- `|d|` = total number of terms in document *d*
-
-#### **Inverse Document Frequency (IDF)**
-Measures how unique a term is across all documents. Rare terms (like "Bioinformatics") receive higher weights than common terms (like "Professor").
-
-```
-IDF(t) = log((N + 1) / (DF(t) + 1)) + 1
-```
-
-**Where:**
-- `N` = total number of documents (faculty profiles)
-- `DF(t)` = document frequency (number of profiles containing term *t*)
-- The `+1` terms provide smoothing to avoid division by zero
-
-#### **TF-IDF Score**
-The final weight for each term is computed as:
-
-```
-TF-IDF(t, d) = TF(t, d) × IDF(t)
-```
+#### **B. Semantic Signal (BERT Embeddings)**
+Uses the `all-MiniLM-L6-v2` BERT model to convert text into **384-dimensional dense vectors**. This allows the system to match "heart disease" with "cardiovascular research" even if they share no common keywords.
 
 ### 3. Document Weighting (`recommender/index_builder.py`)
-To improve relevance, different sections of a faculty profile are weighted differently before vectorization:
+Relevance is further refined by weighting profile sections:
 - **Name**: 4x weight
 - **Research Interests**: 3x weight
 - **Specialization**: 2x weight
 - **Publications**: 2x weight
-- **Bio**: 1x weight
 
-This ensures that a match in a professor's "Research Interests" is more significant than a passing mention in their "Bio".
+### 4. Similarity & Ranking (Hybrid & FAISS)
+ScholarMatch uses **FAISS (Facebook AI Similarity Search)** to index vectors and compute similarities in milliseconds. The final ranking is determined by a **Hybrid Score**:
 
-### 4. Similarity & Ranking (`recommender/similarity.py`)
-When a user searches, their query is converted into a vector using the same TF-IDF model. The system then calculates the **Cosine Similarity** between the query vector and every faculty profile vector.
+$$ \text{Final Score} = 0.3 \times \text{TF-IDF Cosine} + 0.7 \times \text{BERT Similarity} $$
 
-$$ \text{Cosine Similarity}(A, B) = \frac{A \cdot B}{||A|| \times ||B||} $$
+- The **BERT** signal (0.7 weight) handles deep meaning.
+- The **TF-IDF** signal (0.3 weight) ensures exact technical acronyms (like VLSI or IoT) still get high priority.
 
-**Where:**
-- `A · B` = dot product of vectors A and B
-- `||A||` = magnitude (Euclidean norm) of vector A
-- `||B||` = magnitude (Euclidean norm) of vector B
+### 5. Generative AI Layer (LLM)
+Powered by **Google Gemini**, the system includes:
+- **Query Expansion**: Automatically translates vague user queries into a list of 4-6 precise technical keywords.
+- **Explainable AI**: Generates a one-sentence justification for every recommendation (e.g., *"This faculty is a match because they specialize in NLP and clinical imaging...*").
 
-The results are ranked by this similarity score (ranging from 0 to 1), returning the top matches.
+### 6. Publication Intent Filter
+A specialized logic layer that detects if a user is searching for research-heavy matches. It applies a **Penalty-Boost System**:
+- Faculty with verified publication data receive a **1.2x score boost**.
+- Profiles with missing/empty publication data in the query context receive a **0.6x penalty**.
 
 ---
 
 # Project Structure
 
-The project is organized to separate the core recommendation engine from the application logic and UI.
-
 ```text
 DS614-Faculty-Recommender/
 │
-├── app/                         # Application logic
-│   └── engine.py                # Search engine interface connecting UI to recommender backend
+├── app/                         # Orchestration logic
+│   └── engine.py                # Pipeline: Parse -> Expand -> Hybrid Search -> Explain
 │
-├── recommender/                 # Core Algorithm Implementation
-│   ├── preprocessing.py         # Text cleaning and tokenization
-│   ├── vectorizer.py            # Custom TF-IDF implementation
-│   ├── similarity.py            # Cosine similarity and ranking logic
-│   ├── index_builder.py         # Script to build and save the search index
-│   └── query_parser.py          # Handles query processing
+├── recommender/                 # AI Engine Implementation
+│   ├── embedder.py              # BERT encoding logic
+│   ├── llm_layer.py             # Gemini API integration
+│   ├── preprocessing.py         # Text normalization
+│   ├── vectorizer.py            # Custom TF-IDF logic
+│   ├── similarity.py            # Hybrid search & ranking (FAISS)
+│   └── query_parser.py          # Intelligent query parsing
 │
-├── UI/                          # Frontend
-│   └── streamlit_app.py         # Streamlit web interface
+├── index/                       # Vector storage
+│   ├── faiss.index              # BERT vector db
+│   └── vectors.pkl              # TF-IDF index
 │
-├── config/                      # Configuration files
-│   └── settings.py
+├── UI/                          # Interactive Frontend
+│   └── streamlit_app.py         # Streamlit App with AI Insight UI
 │
-├── data/                        # Data storage
-│   └── stopwords.txt            # List of stopwords to ignore
-│
-├── Dockerfile                   # Docker configuration for deployment
-├── railway.toml                 # Railway deployment configuration
 ├── requirements.txt             # Project dependencies
-├── start.sh                     # Startup script
-└── README.md                    # Project documentation
+└── README.md                    # This documentation
 ```
 
 ---
 
 # How to Run Manually (Local Setup)
 
-Follow these steps to set up and run the application on your local machine.
-
-### Prerequisites
-- Python 3.8 or higher installed
-- The `transformed_faculty_data.csv` file must exist in the correct data directory (checked by `config/settings.py`).
-
-### Step 1: Create a Virtual Environment (Optional but Recommended)
-It is best practice to use a virtual environment to manage dependencies.
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-
-# Mac/Linux
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### Step 2: Install Dependencies
+### Step 1: Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 3: Build the Search Index
-The recommendation engine needs a pre-computed index to work. Run this one-liner to generate it:
+### Step 2: Build the AI Search Index
+Before searching, you must generate the hybrid vector indices:
 ```bash
-python -c "from recommender.index_builder import build_index; build_index()"
+python scripts/build_index.py
 ```
-*This command reads the cleaned CSV data, computes TF-IDF vectors, and saves them to `storage/faculty_index.pkl`.*
+*This downloads the BERT model (~85MB) and processes all faculty data into FAISS and TF-IDF formats.*
 
-### Step 4: Run the Streamlit App
-Start the web interface:
+### Step 3: Set Gemini API Key (Optional)
+To enable LLM expansion and explanations:
+```bash
+export GEMINI_API_KEY="your_api_key"
+```
+
+### Step 4: Run the App
 ```bash
 streamlit run UI/streamlit_app.py
 ```
-The application will open automatically in your browser at `http://localhost:8501`.
 
 ---
 
 # How to Run with Docker
-
-You can also run the application in a container without installing Python dependencies locally.
-
-### Step 1: Build the Docker Image
-Navigate to the `DS614-Faculty-Recommender` directory and run:
 ```bash
-docker build -t faculty-recommender .
+docker build -t scholar-match .
+docker run -p 8080:8080 scholar-match
 ```
-
-### Step 2: Run the Container
-```bash
-docker run -p 8080:8080 faculty-recommender
-```
-The app will be accessible at `http://localhost:8080`.
 
 ---
 
-# How to Deploy
+# Team
 
-The application is designed to be deployed easily on cloud platforms like **Railway**.
-
-### Option 1: Automatic Deployment (Recommended)
-This project is configured for continuous deployment.
-1. Fork this repository to your GitHub account.
-2. Login to [Railway.app](https://railway.app/).
-3. Click **"New Project"** -> **"Deploy from GitHub repo"**.
-4. Select your forked repository.
-5. Railway will automatically detect the `Dockerfile` and `railway.toml` config.
-6. Click **Deploy**.
-
-### Option 2: Manual Deployment via CLI
-If you prefer identifying issues before pushing:
-1. Install the Railway CLI: `npm i -g @railway/cli`
-2. Login: `railway login`
-3. Initialize project: `railway init`
-4. Upload and deploy: `railway up`
-
-**Production URL:** [https://ds614-faculty-finder-production.up.railway.app](https://ds614-faculty-finder-production.up.railway.app)
-
----
-
-# Team Members
-
-### Team Name: The Data Engineers
-
-👩‍💻 **Sanjana Nathani**  
+👩‍💻 **Sanjana Nathani**
 - **Student ID:** 202518002  
 - **Program:** M.Sc. Data Science  
 - **Institution:** Dhirubhai Ambani University (DAU), Gandhinagar  
-- **Role in Project:** Data Engineer  
+- **Role in Project:** AI Systems & Data Engineer  
 
 👨‍💻 **Aksh Patel**  
 - **Student ID:** 202518046  
 - **Program:** M.Sc. Data Science  
 - **Institution:** Dhirubhai Ambani University (DAU), Gandhinagar  
-- **Role in Project:** Data Engineer  
+- **Role in Project:** Backend & Data Engineer  
 
 ---
-*This recommender system is part of the larger DS614 Faculty Finder project, demonstrating the end-to-end application of Big Data Engineering principles.*
+*ScholarMatch is part of the larger DS614 Big Data Engineering project, demonstrating the end-to-end application of Modern AI and Data Engineering principles.*
