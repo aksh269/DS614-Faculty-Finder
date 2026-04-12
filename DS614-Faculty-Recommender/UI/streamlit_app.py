@@ -14,17 +14,31 @@ from config.settings import META_FILE, FAISS_INDEX_FILE, INDEX_FILE
 
 # ── Auto-Initialize Index if missing (Critical for fresh Cloud deployments) ──
 def initialize_indices():
-    if not (META_FILE.exists() and FAISS_INDEX_FILE.exists() and INDEX_FILE.exists()):
-        print("[init] 🚀 AI Index files missing. Building them now...")
-        try:
-            from recommender.index_builder import build_all_indices
-            build_all_indices()
-            print("[init] ✅ Indices built successfully.")
-        except Exception as e:
-            st.error(f"Failed to auto-build indices: {e}")
-            print(f"[init] ❌ Error building indices: {e}")
+    # Defensive import to avoid issues if the module is partially loaded
+    try:
+        import recommender.index_builder as ib
+        if not (META_FILE.exists() and FAISS_INDEX_FILE.exists() and INDEX_FILE.exists()):
+            with st.spinner("🚀 First-time setup: Building AI search indices..."):
+                ib.build_all_indices()
+                st.success("✅ AI Indices built successfully!")
+    except Exception as e:
+        st.sidebar.error(f"⚠️ Index Auto-build failed: {e}")
 
 initialize_indices()
+
+# ── Sidebar Manual Maintenance ──
+with st.sidebar:
+    st.markdown("---")
+    st.markdown("### 🛠 Maintenance")
+    if st.button("🔄 Rebuild AI Index", help="Force a rebuild of BERT & FAISS indices"):
+        with st.spinner("🧠 Rebuilding indices..."):
+            try:
+                import recommender.index_builder as ib
+                ib.build_all_indices()
+                st.sidebar.success("✅ Index rebuilt!")
+                st.rerun()
+            except Exception as e:
+                st.sidebar.error(f"❌ Build failed: {e}")
 
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(

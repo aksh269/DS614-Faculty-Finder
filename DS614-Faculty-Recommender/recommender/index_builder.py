@@ -22,19 +22,11 @@ Run this script once (and re-run whenever faculty data changes):
 """
 
 import pickle
-import numpy as np
-import faiss
 from pathlib import Path
 
-from recommender.preprocessing import preprocess
-from recommender.vectorizer import compute_tf, compute_idf, compute_tfidf
-
-from config.settings import (
-    PHASE1_FACULTY_URL,
-    INDEX_FILE,
-    FAISS_INDEX_FILE,
-    META_FILE,
-)
+# ---------------------------------------------------------------------------
+# Data loading
+# ---------------------------------------------------------------------------
 
 
 # ---------------------------------------------------------------------------
@@ -104,6 +96,17 @@ def build_docs(row: dict) -> str:
 # ---------------------------------------------------------------------------
 
 def build_all_indices():
+    import numpy as np
+    import faiss
+    from recommender.preprocessing import preprocess
+    from recommender.vectorizer import compute_tf, compute_idf, compute_tfidf
+    from config.settings import (
+        PHASE1_FACULTY_URL,
+        INDEX_FILE,
+        FAISS_INDEX_FILE,
+        META_FILE,
+    )
+
     data = fetch_data()
 
     raw_texts = []   # for BERT encoding
