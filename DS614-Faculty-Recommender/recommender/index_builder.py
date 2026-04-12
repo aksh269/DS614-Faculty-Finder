@@ -103,7 +103,7 @@ def build_docs(row: dict) -> str:
 # Main builder
 # ---------------------------------------------------------------------------
 
-def build_index():
+def build_all_indices():
     data = fetch_data()
 
     raw_texts = []   # for BERT encoding
