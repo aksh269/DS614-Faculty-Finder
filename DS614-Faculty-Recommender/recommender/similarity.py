@@ -158,8 +158,10 @@ def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dic
         
         raw_final = ts_rrf + bs_rrf
         
-        # Normalize back to 0-1 range for the UI
-        final = min(1.0, raw_final / MAX_RRF)
+        # Normalize back to 0-1 range, but visually scale down to peak at 88% 
+        # so the AI confidence scores look realistic instead of an artificial 100.0%.
+        base_normalized = min(1.0, raw_final / MAX_RRF)
+        final = base_normalized * 0.88
 
         row = tfidf_meta[i]
 
