@@ -22,6 +22,18 @@ try:
 except ImportError:
     print("[llm_layer] ⚠️  google-generativeai not installed — LLM features disabled")
 
+def configure_gemini(api_key: str):
+    """Dynamically configure Gemini API via frontend."""
+    global _client, _GEMINI_AVAILABLE, _api_key
+    if not api_key:
+        return
+    import google.generativeai as genai
+    genai.configure(api_key=api_key)
+    _client = genai.GenerativeModel("gemini-2.0-flash")
+    _GEMINI_AVAILABLE = True
+    _api_key = api_key
+    print("[llm_layer] Gemini client manually configured via UI ✓")
+
 
 # --------------------------------------------------------------------------
 # 1. Query Expansion

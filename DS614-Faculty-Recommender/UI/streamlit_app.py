@@ -7,9 +7,9 @@ from bs4 import BeautifulSoup
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
 
-from recommender.similarity import get_recommendations
+from app.engine import search
 from recommender.query_parser import parse_query
-from recommender.llm_layer import is_llm_available
+from recommender.llm_layer import is_llm_available, configure_gemini
 from config.settings import META_FILE, FAISS_INDEX_FILE, INDEX_FILE
 
 # ── Auto-Initialize Index if missing (Critical for fresh Cloud deployments) ──
@@ -169,7 +169,8 @@ def extract_keywords(text, max_keywords=8):
 
 
 # ── Header ────────────────────────────────────────────────────────────────────
-llm_on = is_llm_available()
+# llm_on is checked inside the sidebar now, but we need a generic check here for the hero banner
+llm_on_header = is_llm_available()
 
 st.markdown(f"""
 <div class="hero">
@@ -177,7 +178,7 @@ st.markdown(f"""
     <p>
         Discover faculty members matching your research interests with AI-powered precision
         <span class="mode-chip">
-            {"✨ Hybrid AI + LLM" if llm_on else "⚡ Hybrid AI (BERT + TF-IDF)"}
+            {"✨ Hybrid AI + LLM" if llm_on_header else "⚡ Hybrid AI (BERT + TF-IDF)"}
         </span>
     </p>
 </div>
@@ -186,10 +187,18 @@ st.markdown(f"""
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
+    st.markdown("## 🤖 AI Configuration")
+    user_api_key = st.text_input("Gemini API Key (Optional)", type="password", help="Enter your Gemini API key to enable LLM-powered query expansion and ranking explanations.")
+    if user_api_key:
+        configure_gemini(user_api_key)
+
+    llm_on = is_llm_available()
+    
     st.markdown("## ⚙️ Display Settings")
+    use_gemini       = st.toggle("Enable Gemini (AI Assistant)", llm_on, disabled=not llm_on, help="Requires GEMINI_API_KEY. Uncheck to run pure Hybrid Search.")
     show_scores      = st.toggle("Show Match Scores",     True,  help="Display similarity scores")
     show_keywords    = st.toggle("Show Keywords",         True,  help="Display research keywords as tags")
-    show_explanation = st.toggle("Show AI Explanation",   True,  help="Show why each result was recommended")
+    show_explanation = st.toggle("Show AI Explanation",   use_gemini, disabled=not use_gemini, help="Show why each result was recommended")
     show_score_breakdown = st.toggle("Show Score Breakdown", False, help="Show TF-IDF vs BERT individual scores")
 
     st.markdown("---")
@@ -237,8 +246,7 @@ if search_clicked or query:
     clean_query, top_k = parse_query(query)
 
     with st.spinner("🧠 Running AI-powered hybrid search…"):
-        # get_recommendations now calls hybrid_search + LLM internally
-        results = get_recommendations(clean_query, top_k)
+        results = search(clean_query, top_k=top_k, use_gemini=use_gemini)
 
     if not results:
         st.error("❌ No matching faculty found. Try different keywords.")
