@@ -8,11 +8,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
 
 # Force Streamlit to clear Python's internal cache for all custom modules
+import config.settings
 import recommender.llm_layer
 import recommender.similarity
 import app.engine
 import importlib
 
+importlib.reload(config.settings)
 importlib.reload(recommender.llm_layer)
 importlib.reload(recommender.similarity)
 importlib.reload(app.engine)
