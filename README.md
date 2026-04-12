@@ -68,19 +68,19 @@ The application is deployed on Railway and is accessible publicly for demonstrat
 The following screenshots demonstrate the ScholarMatch application in action:
 
 ### 🏠 Home Page - Search Interface
-![Home page showing the DAIICT Faculty Finder search interface with display settings and smart search tips](./Screenshots/SS 1.png)
+![Home page showing the DAIICT Faculty Finder search interface with display settings and smart search tips](./Screenshots/ss1.png)
 
 ### 🔍 Search Example: Speech Recognition
-![Search results for "speech recognition" query showing 3 matching faculty members with match scores](./Screenshots/SS 2.png)
+![Search results for "speech recognition" query showing 3 matching faculty members with match scores](./Screenshots/ss2.png)
 
 ### 📊 Faculty Results with Match Scores
-![Detailed faculty profiles showing research interests, courses, and relevance scores](./Screenshots/SS 3.png)
+![Detailed faculty profiles showing research interests, courses, and relevance scores](./Screenshots/ss3.png)
 
 ### 💡 Search Example: NLP
-![Search results for "NLP" showing 5 matching faculty members with their expertise areas](./Screenshots/SS 4.png)
+![Search results for "NLP" showing 5 matching faculty members with their expertise areas](./Screenshots/ss4.png)
 
 ### 🎯 Ranked Results Display
-![Faculty search results ranked by hybrid AI scores with detailed research interests](./Screenshots/SS 5.png)
+![Faculty search results ranked by hybrid AI scores with detailed research interests](./Screenshots/ss5.png)
 
 ---
 
