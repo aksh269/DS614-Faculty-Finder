@@ -166,6 +166,8 @@ def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dic
         # ── Publication intent modifier ───────────────────────────────────
         if pub_intent:
             final *= _pub_score(row)
+        
+        final = min(1.0, final)
 
         name = row.get("name", "")
         profile_url = row.get("profile_url", "")
