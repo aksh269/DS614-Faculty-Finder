@@ -53,7 +53,8 @@ def search(query: str) -> list[dict]:
     # If Gemini is unavailable, expanded_keywords=[] and search_text=clean_q
 
     # ── Step 3: Hybrid Search (TF-IDF + BERT via FAISS) ──────────────────
-    results = hybrid_search(search_text, top_k=k)
+    # Pass search_text (expanded) for TF-IDF, and clean_q (raw) for BERT
+    results = hybrid_search(query=search_text, top_k=k, raw_query=clean_q)
 
     # ── Step 4: LLM Result Explanation ────────────────────────────────────
     for r in results:

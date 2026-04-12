@@ -18,6 +18,5 @@ FAISS_INDEX_FILE = INDEX_DIR / "faiss.index"  # FAISS vector index
 META_FILE        = INDEX_DIR / "meta.pkl"      # faculty metadata for FAISS results
 
 # Hybrid search blending weights: Final = ALPHA*TF-IDF + BETA*BERT
-HYBRID_ALPHA = 0.3   # weight for TF-IDF (keyword signal)
-HYBRID_BETA  = 0.7   # weight for BERT  (semantic signal)
-
+HYBRID_ALPHA = 0.5   # weight for TF-IDF (keyword signal)
+HYBRID_BETA  = 0.5   # weight for BERT  (semantic signal)

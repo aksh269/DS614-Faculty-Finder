@@ -66,7 +66,7 @@ def _pub_score(row: dict) -> float:
 # Hybrid Search
 # ---------------------------------------------------------------------------
 
-def hybrid_search(query: str, top_k: int = 5) -> list[dict]:
+def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dict]:
     """
     Find the top-k faculty members that best match the query using hybrid search.
 
@@ -77,8 +77,9 @@ def hybrid_search(query: str, top_k: int = 5) -> list[dict]:
       4. Sort by final score and return top_k results
 
     Args:
-        query:  the (possibly LLM-expanded) search text
-        top_k:  number of results to return
+        query:     the (possibly LLM-expanded) keyword search text for TF-IDF
+        top_k:     number of results to return
+        raw_query: the original natural language query for BERT
 
     Returns:
         List of result dicts with keys: name, specialization, research,
@@ -91,11 +92,13 @@ def hybrid_search(query: str, top_k: int = 5) -> list[dict]:
         tfidf_vectors, tfidf_meta, idf = pickle.load(f)
 
     # ── Detect publication intent in query ───────────────────────────────
-    pub_intent = _has_publication_intent(query)
+    # Use raw_query if available to capture the user's actual intent
+    intent_check_text = raw_query if raw_query else query
+    pub_intent = _has_publication_intent(intent_check_text)
     if pub_intent:
         print("[hybrid_search] 📚 Publication intent detected — applying pub score modifier")
 
-    # ── TF-IDF query vector ───────────────────────────────────────────────
+    # ── TF-IDF query vector (Uses keyword-heavy expanded query) ───────────
     tokens = preprocess(query)
     if not tokens:
         return []
@@ -115,7 +118,9 @@ def hybrid_search(query: str, top_k: int = 5) -> list[dict]:
 
     faiss_index = faiss.read_index(str(FAISS_INDEX_FILE))
 
-    q_emb = encode_query(query)                     # shape: (384,)
+    # BERT performs much better with natural language sentences rather than keyword strings
+    bert_query = raw_query if raw_query else query
+    q_emb = encode_query(bert_query)               # shape: (384,)
     q_emb = q_emb.reshape(1, -1)                   # FAISS needs (1, D)
 
     # Search top_k*3 so we have enough candidates after merging
