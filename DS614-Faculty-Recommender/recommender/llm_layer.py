@@ -57,18 +57,7 @@ JSON array:"""
 
 
 def expand_query(user_query: str) -> tuple[list[str], str]:
-    """
-    Use Gemini to expand a natural-language query into technical keywords.
 
-    Args:
-        user_query: raw user search string
-
-    Returns:
-        (keywords_list, expanded_text)
-        - keywords_list: e.g. ["machine learning", "healthcare AI"]
-        - expanded_text: the keywords joined as a single string for embedding
-          Falls back to ([], user_query) if Gemini is unavailable.
-    """
     if not _GEMINI_AVAILABLE:
         return [], user_query
 
@@ -118,18 +107,7 @@ def explain_result(
     specialization: str,
     research: str,
 ) -> str:
-    """
-    Generate a natural-language explanation for why a faculty member was recommended.
 
-    Args:
-        query:          original (or expanded) user search query
-        faculty_name:   faculty member's name
-        specialization: their listed specialization
-        research:       their research areas/interests
-
-    Returns:
-        A one-sentence explanation string, or an empty string if unavailable.
-    """
     if not _GEMINI_AVAILABLE:
         return ""
 

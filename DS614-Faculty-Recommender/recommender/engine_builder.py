@@ -1,37 +1,5 @@
-"""
-index_builder.py — Builds BOTH the TF-IDF index (pickle) AND the FAISS vector index.
-
-Two indices are created side-by-side so that hybrid search can use both:
-
-TF-IDF index  (vectors.pkl):
-    Contains: (tfidf_vectors_list, metadata_list, idf_dict)
-    Used for: keyword-level exact-match scoring
-
-FAISS index   (faiss.index + meta.pkl):
-    Contains: FAISS IndexFlatIP with L2-normalised BERT embeddings
-    Used for: semantic similarity — finds "meaning-alike" faculty
-
-How FAISS works (IndexFlatIP):
-    - "IP" = Inner Product (dot product)
-    - Since embeddings are L2-normalised, dot product == cosine similarity
-    - We store embeddings as a flat array → perfect for our dataset size (<1000 faculty)
-    - index.search(query_vec, k) returns the top-k nearest faculty in ~ms
-
-Run this script once (and re-run whenever faculty data changes):
-    python scripts/build_index.py
-"""
-
 import pickle
 from pathlib import Path
-
-# ---------------------------------------------------------------------------
-# Data loading
-# ---------------------------------------------------------------------------
-
-
-# ---------------------------------------------------------------------------
-# Data loading
-# ---------------------------------------------------------------------------
 
 def fetch_data():
     from config.settings import PROJECT_ROOT, DATA_DIR
@@ -76,12 +44,7 @@ def safe(x) -> str:
 
 
 def build_docs(row: dict) -> str:
-    """
-    Construct a weighted text document for a faculty member.
 
-    Fields are repeated to give them higher TF-IDF importance:
-        name × 4, research × 3, specialization × 2, publications × 2, bio × 1
-    """
     return (
         safe(row.get("name")) * 4 + " " +
         safe(row.get("research")) * 3 + " " +
@@ -91,11 +54,7 @@ def build_docs(row: dict) -> str:
     )
 
 def build_clean_text(row: dict) -> str:
-    """
-    Construct a natural language string for BERT embeddings.
-    Unlike TF-IDF, BERT needs sentence-like structure to understand context,
-    not repeated words.
-    """
+
     parts = []
     if name := safe(row.get("name")): parts.append(f"Professor {name}.")
     if spec := safe(row.get("specialization")): parts.append(f"Specialization: {spec}.")

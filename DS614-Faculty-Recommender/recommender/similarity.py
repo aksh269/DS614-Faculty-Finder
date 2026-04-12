@@ -67,24 +67,6 @@ def _pub_score(row: dict) -> float:
 # ---------------------------------------------------------------------------
 
 def hybrid_search(query: str, top_k: int = 5) -> list[dict]:
-    """
-    Find the top-k faculty members that best match the query using hybrid search.
-
-    Steps:
-      1. Load TF-IDF index → score every faculty (exact match signal)
-      2. Load FAISS index  → score top_k*3 candidates (semantic signal)
-      3. Merge scores: Final = HYBRID_ALPHA * tfidf + HYBRID_BETA * bert
-      4. Sort by final score and return top_k results
-
-    Args:
-        query:  the (possibly LLM-expanded) search text
-        top_k:  number of results to return
-
-    Returns:
-        List of result dicts with keys: name, specialization, research,
-        mail, publications, pub_links, profile_url,
-        tfidf_score, bert_score, score
-    """
 
     # ── Load TF-IDF index ────────────────────────────────────────────────
     with open(INDEX_FILE, "rb") as f:

@@ -1,43 +1,9 @@
-"""
-engine.py — Main search orchestration pipeline.
-
-Full flow for each user query:
-  ┌─────────────────────┐
-  │  1. Parse query     │  extract top-k number from "top 3 machine learning"
-  └────────┬────────────┘
-           │
-  ┌────────▼────────────┐
-  │  2. LLM Expansion   │  Gemini: "AI for medicine" → ["healthcare AI", "medical imaging"]
-  └────────┬────────────┘          (graceful skip if no GEMINI_API_KEY)
-           │
-  ┌────────▼────────────┐
-  │  3. Hybrid Search   │  0.3×TF-IDF + 0.7×BERT via FAISS
-  └────────┬────────────┘
-           │
-  ┌────────▼────────────┐
-  │  4. LLM Explanation │  Gemini generates "Recommended because…" per result
-  └────────┬────────────┘          (graceful skip if no GEMINI_API_KEY)
-           │
-  ┌────────▼────────────┐
-  │  5. Return results  │  enriched dicts with score, explanation, expanded_keywords
-  └─────────────────────┘
-"""
-
 from recommender.similarity import hybrid_search
 from recommender.query_parser import parse_query
 from recommender.llm_layer import expand_query, explain_result, is_llm_available
 
 
 def search(query: str, top_k: int = 5) -> list[dict]:
-    """
-    Full AI-powered faculty search pipeline.
-
-    Args:
-        query: raw user query string (e.g. "top 3 AI for healthcare")
-
-    Returns:
-        List of enriched faculty dicts
-    """
 
     # ── Step 1: Parse query ("top N …" extraction) ────────────────────────
     clean_q, k = parse_query(query)
