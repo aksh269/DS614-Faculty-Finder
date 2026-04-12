@@ -90,6 +90,20 @@ def build_docs(row: dict) -> str:
         safe(row.get("bio"))
     )
 
+def build_clean_text(row: dict) -> str:
+    """
+    Construct a natural language string for BERT embeddings.
+    Unlike TF-IDF, BERT needs sentence-like structure to understand context,
+    not repeated words.
+    """
+    parts = []
+    if name := safe(row.get("name")): parts.append(f"Professor {name}.")
+    if spec := safe(row.get("specialization")): parts.append(f"Specialization: {spec}.")
+    if res := safe(row.get("research")): parts.append(f"Research interests: {res}.")
+    if pub := safe(row.get("publications")): parts.append(f"Key publications include: {pub}.")
+    if bio := safe(row.get("bio")): parts.append(f"Biography: {bio}.")
+    return " ".join(parts)
+
 
 # ---------------------------------------------------------------------------
 # Main builder
@@ -109,16 +123,18 @@ def build_all_indices():
 
     data = fetch_data()
 
-    raw_texts = []   # for BERT encoding
-    docs      = []   # tokenised for TF-IDF
+    raw_texts = []   # for BERT encoding (natural text)
+    docs      = []   # tokenised for TF-IDF (weighted text)
     meta      = []   # original row dicts
 
     for row in data:
-        text   = build_docs(row)
-        tokens = preprocess(text)
+        tfidf_text = build_docs(row)
+        bert_text  = build_clean_text(row)
+
+        tokens = preprocess(tfidf_text)
         docs.append(tokens)
         meta.append(row)
-        raw_texts.append(text)   # keep unprocessed for BERT
+        raw_texts.append(bert_text)   # Keep as clean, natural text for BERT
 
     # -------------------------------------------------------------------
     # Phase A: Build TF-IDF index (unchanged logic)
