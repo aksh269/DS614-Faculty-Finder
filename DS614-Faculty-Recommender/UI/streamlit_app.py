@@ -16,7 +16,7 @@ from config.settings import META_FILE, FAISS_INDEX_FILE, INDEX_FILE
 def initialize_indices():
     # Defensive import to avoid issues if the module is partially loaded
     try:
-        import recommender.index_builder as ib
+        import recommender.engine_builder as ib
         if not (META_FILE.exists() and FAISS_INDEX_FILE.exists() and INDEX_FILE.exists()):
             with st.spinner("🚀 First-time setup: Building AI search indices..."):
                 ib.build_all_indices()
@@ -33,7 +33,7 @@ with st.sidebar:
     if st.button("🔄 Rebuild AI Index", help="Force a rebuild of BERT & FAISS indices"):
         with st.spinner("🧠 Rebuilding indices..."):
             try:
-                import recommender.index_builder as ib
+                import recommender.engine_builder as ib
                 ib.build_all_indices()
                 st.sidebar.success("✅ Index rebuilt!")
                 st.rerun()
