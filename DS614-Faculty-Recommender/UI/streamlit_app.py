@@ -7,18 +7,6 @@ from bs4 import BeautifulSoup
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
 
-# Force Streamlit to clear Python's internal cache for all custom modules
-import config.settings
-import recommender.llm_layer
-import recommender.similarity
-import app.engine
-import importlib
-
-importlib.reload(config.settings)
-importlib.reload(recommender.llm_layer)
-importlib.reload(recommender.similarity)
-importlib.reload(app.engine)
-
 from app.engine import search
 from recommender.query_parser import parse_query
 from recommender.llm_layer import is_llm_available, configure_gemini
@@ -381,8 +369,11 @@ if not search_clicked:
     <div style="text-align:center;color:#666;padding:20px;">
         <p>🎯 Enter your research interests above to find matching faculty members</p>
         <p style="font-size:0.9em;">
-            Powered by <strong>BERT + FAISS + Hybrid Search</strong>
+            Powered by <strong>Hybrid Search</strong>
             &nbsp;·&nbsp; Team "The Data Engineers"
+        </p>
+        <p style="font-size:0.9em;">
+            <strong>(Members: Sanjana Nathani & Aksh Patel)</strong> <b>&nbsp;·&nbsp; DAU, Gandhinagar</b>
         </p>
     </div>
     """, unsafe_allow_html=True)

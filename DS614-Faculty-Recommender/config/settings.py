@@ -17,5 +17,6 @@ STOPWORDS_PATH = DATA_DIR / "stopwords.txt"
 FAISS_INDEX_FILE = INDEX_DIR / "faiss.index"  # FAISS vector index
 META_FILE        = INDEX_DIR / "meta.pkl"      # faculty metadata for FAISS results
 
-# Hybrid search configuration
-RRF_K = 60   # Reciprocal Rank Fusion constant (industry standard is usually ~60)
+# Hybrid search blending weights: Final = ALPHA*TF-IDF + BETA*BERT
+HYBRID_ALPHA = 0.5   # weight for TF-IDF (keyword signal)
+HYBRID_BETA  = 0.5   # weight for BERT  (semantic signal)

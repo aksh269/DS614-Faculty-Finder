@@ -7,7 +7,8 @@ from config.settings import (
     INDEX_FILE,
     FAISS_INDEX_FILE,
     META_FILE,
-    RRF_K,
+    HYBRID_ALPHA,
+    HYBRID_BETA,
 )
 from recommender.preprocessing import preprocess
 from recommender.vectorizer import compute_tf, compute_tfidf
@@ -62,23 +63,22 @@ def _pub_score(row: dict) -> float:
 
 
 # ---------------------------------------------------------------------------
-# Hybrid Search (RRF Matrix)
+# Hybrid Search
 # ---------------------------------------------------------------------------
 
-def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dict]:
+def hybrid_search(query: str, top_k: int = 5) -> list[dict]:
     """
     Find the top-k faculty members that best match the query using hybrid search.
 
     Steps:
       1. Load TF-IDF index → score every faculty (exact match signal)
       2. Load FAISS index  → score top_k*3 candidates (semantic signal)
-      3. Reciprocal Rank Fusion (RRF): combine isolated rankings
-      4. Sort by final normalized score and return top_k results
+      3. Merge scores: Final = HYBRID_ALPHA * tfidf + HYBRID_BETA * bert
+      4. Sort by final score and return top_k results
 
     Args:
-        query:     the (possibly LLM-expanded) keyword search text for TF-IDF
-        top_k:     number of results to return
-        raw_query: the original natural language query for BERT
+        query:  the (possibly LLM-expanded) search text
+        top_k:  number of results to return
 
     Returns:
         List of result dicts with keys: name, specialization, research,
@@ -91,13 +91,11 @@ def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dic
         tfidf_vectors, tfidf_meta, idf = pickle.load(f)
 
     # ── Detect publication intent in query ───────────────────────────────
-    # Use raw_query if available to capture the user's actual intent
-    intent_check_text = raw_query if raw_query else query
-    pub_intent = _has_publication_intent(intent_check_text)
+    pub_intent = _has_publication_intent(query)
     if pub_intent:
         print("[hybrid_search] 📚 Publication intent detected — applying pub score modifier")
 
-    # ── TF-IDF query vector (Uses keyword-heavy expanded query) ───────────
+    # ── TF-IDF query vector ───────────────────────────────────────────────
     tokens = preprocess(query)
     if not tokens:
         return []
@@ -117,13 +115,11 @@ def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dic
 
     faiss_index = faiss.read_index(str(FAISS_INDEX_FILE))
 
-    # BERT performs much better with natural language sentences rather than keyword strings
-    bert_query = raw_query if raw_query else query
-    q_emb = encode_query(bert_query)               # shape: (384,)
+    q_emb = encode_query(query)                     # shape: (384,)
     q_emb = q_emb.reshape(1, -1)                   # FAISS needs (1, D)
 
-    # Search top_k*4 so we have enough candidates after merging
-    n_search = min(top_k * 4, faiss_index.ntotal)
+    # Search top_k*3 so we have enough candidates after merging
+    n_search = min(top_k * 3, faiss_index.ntotal)
     bert_dists, bert_idxs = faiss_index.search(q_emb, n_search)
 
     bert_scores = {}
@@ -132,43 +128,23 @@ def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dic
             bert_scores[int(idx)] = float(max(0.0, score))
 
 
-    # ── Reciprocal Rank Fusion (RRF) ──────────────────────────────────────
-    
-    # Filter 0s to prevent random bottom-tier ties getting false rank correlation
-    tfidf_nonzero = {k: v for k, v in tfidf_scores.items() if v > 0.0}
-    bert_nonzero  = {k: v for k, v in bert_scores.items() if v > 0.0}
-
-    tfidf_ranking = sorted(tfidf_nonzero.keys(), key=lambda x: tfidf_nonzero[x], reverse=True)
-    bert_ranking  = sorted(bert_nonzero.keys(), key=lambda x: bert_nonzero[x], reverse=True)
-
-    tfidf_ranks = {idx: rank for rank, idx in enumerate(tfidf_ranking, start=1)}
-    bert_ranks  = {idx: rank for rank, idx in enumerate(bert_ranking, start=1)}
-
-    MAX_RRF = (1.0 / (RRF_K + 1)) + (1.0 / (RRF_K + 1))
+    # ── Merge scores ──────────────────────────────────────────────────────
+    # Union of indices from both legs
     all_indices = set(tfidf_scores.keys()) | set(bert_scores.keys())
 
     combined = []
     for i in all_indices:
-        tr = tfidf_ranks.get(i, 1000)   # 1000 = strong penalty if missing
-        br = bert_ranks.get(i, 1000)
-        
-        # RRF Calculation
-        ts_rrf = 1.0 / (RRF_K + tr)
-        bs_rrf = 1.0 / (RRF_K + br)
-        
-        raw_final = ts_rrf + bs_rrf
-        
-        # Normalize back to 0-1 range, but visually scale down to peak at 88% 
-        # so the AI confidence scores look realistic instead of an artificial 100.0%.
-        base_normalized = min(1.0, raw_final / MAX_RRF)
-        final = base_normalized * 0.88
+        ts = tfidf_scores.get(i, 0.0)
+        bs = bert_scores.get(i, 0.0)
+        final = HYBRID_ALPHA * ts + HYBRID_BETA * bs
 
-        row = tfidf_meta[i]
+        row = tfidf_meta[i]  # original faculty dict
 
         # ── Publication intent modifier ───────────────────────────────────
         if pub_intent:
             final *= _pub_score(row)
         
+        # Clamp match score to 1.0 (100%)
         final = min(1.0, final)
 
         name = row.get("name", "")
@@ -185,8 +161,8 @@ def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dic
             "publications":  row.get("publications", ""),
             "pub_links":     row.get("pub_links", []),
             "profile_url":   profile_url,
-            "tfidf_score":   round(min(1.0, ts_rrf * (RRF_K + 1)), 4),
-            "bert_score":    round(min(1.0, bs_rrf * (RRF_K + 1)), 4),
+            "tfidf_score":   round(ts, 4),
+            "bert_score":    round(bs, 4),
             "score":         round(final, 4),
         })
 
@@ -195,12 +171,8 @@ def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dic
 
 
 # ---------------------------------------------------------------------------
-# Backwards-compatible wrapper (used by streamlit_app.py directly)
+# Backwards-compatible wrapper
 # ---------------------------------------------------------------------------
 
 def get_recommendations(query: str, top_k: int = 5) -> list[dict]:
-    """
-    Drop-in replacement for the old TF-IDF get_recommendations.
-    Now delegates to hybrid_search().
-    """
     return hybrid_search(query, top_k)
