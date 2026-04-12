@@ -7,8 +7,7 @@ from config.settings import (
     INDEX_FILE,
     FAISS_INDEX_FILE,
     META_FILE,
-    HYBRID_ALPHA,
-    HYBRID_BETA,
+    RRF_K,
 )
 from recommender.preprocessing import preprocess
 from recommender.vectorizer import compute_tf, compute_tfidf
@@ -35,7 +34,7 @@ def cosine(v1: dict, v2: dict) -> float:
 _PUB_INTENT_KEYWORDS = {
     "publication", "publications", "published", "paper", "papers",
     "journal", "journals", "article", "articles", "research output",
-    "citations", "cited", "conference", "work", "written",
+    "citations", "cited", "conference"
 }
 
 def _has_publication_intent(query: str) -> bool:
@@ -63,7 +62,7 @@ def _pub_score(row: dict) -> float:
 
 
 # ---------------------------------------------------------------------------
-# Hybrid Search
+# Hybrid Search (RRF Matrix)
 # ---------------------------------------------------------------------------
 
 def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dict]:
@@ -73,8 +72,8 @@ def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dic
     Steps:
       1. Load TF-IDF index → score every faculty (exact match signal)
       2. Load FAISS index  → score top_k*3 candidates (semantic signal)
-      3. Merge scores: Final = HYBRID_ALPHA * tfidf + HYBRID_BETA * bert
-      4. Sort by final score and return top_k results
+      3. Reciprocal Rank Fusion (RRF): combine isolated rankings
+      4. Sort by final normalized score and return top_k results
 
     Args:
         query:     the (possibly LLM-expanded) keyword search text for TF-IDF
@@ -123,33 +122,48 @@ def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dic
     q_emb = encode_query(bert_query)               # shape: (384,)
     q_emb = q_emb.reshape(1, -1)                   # FAISS needs (1, D)
 
-    # Search top_k*3 so we have enough candidates after merging
-    n_search = min(top_k * 3, faiss_index.ntotal)
+    # Search top_k*4 so we have enough candidates after merging
+    n_search = min(top_k * 4, faiss_index.ntotal)
     bert_dists, bert_idxs = faiss_index.search(q_emb, n_search)
-    # bert_dists[0]: cosine similarities (since vectors are L2-normalised)
-    # bert_idxs[0]:  corresponding row indices in meta
 
     bert_scores = {}
     for score, idx in zip(bert_dists[0], bert_idxs[0]):
-        if idx >= 0:   # FAISS returns -1 for padding
-            # Clip to [0, 1] — cosine can be slightly negative for dissimilar vectors
+        if idx >= 0:
             bert_scores[int(idx)] = float(max(0.0, score))
 
-    # ── Merge scores ──────────────────────────────────────────────────────
-    # Union of indices from both legs
+
+    # ── Reciprocal Rank Fusion (RRF) ──────────────────────────────────────
+    
+    # Filter 0s to prevent random bottom-tier ties getting false rank correlation
+    tfidf_nonzero = {k: v for k, v in tfidf_scores.items() if v > 0.0}
+    bert_nonzero  = {k: v for k, v in bert_scores.items() if v > 0.0}
+
+    tfidf_ranking = sorted(tfidf_nonzero.keys(), key=lambda x: tfidf_nonzero[x], reverse=True)
+    bert_ranking  = sorted(bert_nonzero.keys(), key=lambda x: bert_nonzero[x], reverse=True)
+
+    tfidf_ranks = {idx: rank for rank, idx in enumerate(tfidf_ranking, start=1)}
+    bert_ranks  = {idx: rank for rank, idx in enumerate(bert_ranking, start=1)}
+
+    MAX_RRF = (1.0 / (RRF_K + 1)) + (1.0 / (RRF_K + 1))
     all_indices = set(tfidf_scores.keys()) | set(bert_scores.keys())
 
     combined = []
     for i in all_indices:
-        ts = tfidf_scores.get(i, 0.0)
-        bs = bert_scores.get(i, 0.0)
-        final = HYBRID_ALPHA * ts + HYBRID_BETA * bs
+        tr = tfidf_ranks.get(i, 1000)   # 1000 = strong penalty if missing
+        br = bert_ranks.get(i, 1000)
+        
+        # RRF Calculation
+        ts_rrf = 1.0 / (RRF_K + tr)
+        bs_rrf = 1.0 / (RRF_K + br)
+        
+        raw_final = ts_rrf + bs_rrf
+        
+        # Normalize back to 0-1 range for the UI
+        final = min(1.0, raw_final / MAX_RRF)
 
-        row = tfidf_meta[i]  # original faculty dict
+        row = tfidf_meta[i]
 
         # ── Publication intent modifier ───────────────────────────────────
-        # If the user is specifically asking about publications, penalise
-        # faculty who have no publication data, and reward those who do.
         if pub_intent:
             final *= _pub_score(row)
 
@@ -167,8 +181,8 @@ def hybrid_search(query: str, top_k: int = 5, raw_query: str = None) -> list[dic
             "publications":  row.get("publications", ""),
             "pub_links":     row.get("pub_links", []),
             "profile_url":   profile_url,
-            "tfidf_score":   round(ts, 4),
-            "bert_score":    round(bs, 4),
+            "tfidf_score":   round(min(1.0, ts_rrf * (RRF_K + 1)), 4),
+            "bert_score":    round(min(1.0, bs_rrf * (RRF_K + 1)), 4),
             "score":         round(final, 4),
         })
 
