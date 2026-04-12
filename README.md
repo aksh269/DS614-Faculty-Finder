@@ -80,7 +80,7 @@ The following screenshots demonstrate the ScholarMatch application in action:
 ![Search results for "NLP" showing 5 matching faculty members with their expertise areas](./Screenshots/ss4.png)
 
 ### 🎯 Ranked Results Display
-![Faculty search results ranked by hybrid AI scores with detailed research interests](./Screenshots/ss5.png)
+![Faculty search results ranked by hybrid AI scores with transparent BERT semantic and TF-IDF keyword breakdowns](./Screenshots/ss5.png)
 
 ---
 

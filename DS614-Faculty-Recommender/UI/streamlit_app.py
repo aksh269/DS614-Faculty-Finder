@@ -77,8 +77,16 @@ st.markdown("""
 }
 
 /* ── Score breakdown bar ── */
-.score-breakdown { margin-top: 8px; font-size: 0.72rem; color: #94a3b8; }
-.score-breakdown span { color: #c7d2fe; font-weight: 600; }
+.score-breakdown {
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    background: rgba(255,255,255,0.03);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.score-breakdown span { color: #818cf8; font-weight: 700; }
 
 /* ── LLM explanation box ── */
 .explanation-box {
@@ -190,7 +198,7 @@ with st.sidebar:
     st.markdown("## ⚙️ Display Settings")
     show_scores      = st.toggle("Show Match Scores",     True,  help="Display similarity scores")
     show_keywords    = st.toggle("Show Keywords",         True,  help="Display research keywords as tags")
-    show_score_breakdown = st.toggle("Show Score Breakdown", False, help="Show TF-IDF vs BERT individual scores")
+    show_score_breakdown = st.toggle("Show Score Breakdown", True, help="Show TF-IDF vs BERT individual scores")
 
     st.markdown("---")
     st.markdown("### 💡 Smart Search Tips")
