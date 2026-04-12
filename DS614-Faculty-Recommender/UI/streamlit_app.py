@@ -42,7 +42,7 @@ with st.sidebar:
 
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="DAIICT Faculty Finder",
+    page_title="ScholarMatch",
     page_icon="🎓",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -173,7 +173,7 @@ llm_on = is_llm_available()
 
 st.markdown(f"""
 <div class="hero">
-    <h1>🎓 DAIICT Faculty Finder</h1>
+    <h1>🎓 ScholarMatch AI</h1>
     <p>
         Discover faculty members matching your research interests with AI-powered precision
         <span class="mode-chip">
@@ -262,7 +262,7 @@ if search_clicked or query:
     # ── Results ───────────────────────────────────────────────────────────
     for idx, faculty in enumerate(results, start=1):
         with st.container():
-            st.markdown('<div class="faculty-card">', unsafe_allow_html=True)
+            st.markdown(f'<div class="faculty-card" style="animation-delay: {idx * 0.08}s;">', unsafe_allow_html=True)
 
             col_avatar, col_info, col_score = st.columns([1.5, 4, 1.5])
 

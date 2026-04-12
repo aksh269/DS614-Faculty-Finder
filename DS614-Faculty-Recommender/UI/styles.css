@@ -349,9 +349,14 @@ div[data-testid="stVerticalBlock"]>div:has(.faculty-card) {
     padding: 0 !important;
 }
 
-[data-testid="stHeader"],
+/* Hide footer but KEEP header so the sidebar toggle arrow remains clickable */
 footer {
     display: none !important;
+}
+
+/* Make header transparent so it blends perfectly with the custom hero */
+[data-testid="stHeader"] {
+    background-color: transparent !important;
 }
 
 /* Scrollbar Styling */
