@@ -173,7 +173,7 @@ llm_on = is_llm_available()
 
 st.markdown(f"""
 <div class="hero">
-    <h1>🎓 ScholarMatch AI</h1>
+    <h1>🎓 <span class="gradient-text">ScholarMatch AI</span></h1>
     <p>
         Discover faculty members matching your research interests with AI-powered precision
         <span class="mode-chip">

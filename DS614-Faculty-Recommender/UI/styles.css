@@ -70,11 +70,18 @@ body {
     font-weight: 800;
     letter-spacing: -0.04em;
     margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+.hero h1 .gradient-text {
     background: var(--grad-hero);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: fadeInDown 0.8s ease-out;
 }
 
 .hero p {
