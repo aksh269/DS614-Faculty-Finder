@@ -7,13 +7,18 @@ from bs4 import BeautifulSoup
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
 
+# Force Streamlit to clear Python's internal cache for all custom modules
+import recommender.llm_layer
+import recommender.similarity
+import app.engine
+import importlib
+
+importlib.reload(recommender.llm_layer)
+importlib.reload(recommender.similarity)
+importlib.reload(app.engine)
+
 from app.engine import search
 from recommender.query_parser import parse_query
-
-# Force Streamlit to clear Python's internal cache for this module
-import recommender.llm_layer
-import importlib
-importlib.reload(recommender.llm_layer)
 from recommender.llm_layer import is_llm_available, configure_gemini
 
 from config.settings import META_FILE, FAISS_INDEX_FILE, INDEX_FILE
