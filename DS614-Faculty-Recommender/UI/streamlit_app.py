@@ -9,7 +9,13 @@ sys.path.append(str(ROOT))
 
 from app.engine import search
 from recommender.query_parser import parse_query
+
+# Force Streamlit to clear Python's internal cache for this module
+import recommender.llm_layer
+import importlib
+importlib.reload(recommender.llm_layer)
 from recommender.llm_layer import is_llm_available, configure_gemini
+
 from config.settings import META_FILE, FAISS_INDEX_FILE, INDEX_FILE
 
 # ── Auto-Initialize Index if missing (Critical for fresh Cloud deployments) ──
