@@ -198,20 +198,10 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 
-# ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 🤖 AI Configuration")
-    user_api_key = st.text_input("Gemini API Key (Optional)", type="password", help="Enter your Gemini API key to enable LLM-powered query expansion and ranking explanations.")
-    if user_api_key:
-        configure_gemini(user_api_key)
-
-    llm_on = is_llm_available()
-    
     st.markdown("## ⚙️ Display Settings")
-    use_gemini       = st.toggle("Enable Gemini (AI Assistant)", llm_on, disabled=not llm_on, help="Requires GEMINI_API_KEY. Uncheck to run pure Hybrid Search.")
     show_scores      = st.toggle("Show Match Scores",     True,  help="Display similarity scores")
     show_keywords    = st.toggle("Show Keywords",         True,  help="Display research keywords as tags")
-    show_explanation = st.toggle("Show AI Explanation",   use_gemini, disabled=not use_gemini, help="Show why each result was recommended")
     show_score_breakdown = st.toggle("Show Score Breakdown", False, help="Show TF-IDF vs BERT individual scores")
 
     st.markdown("---")
@@ -259,7 +249,7 @@ if search_clicked or query:
     clean_query, top_k = parse_query(query)
 
     with st.spinner("🧠 Running AI-powered hybrid search…"):
-        results = search(clean_query, top_k=top_k, use_gemini=use_gemini)
+        results = search(clean_query, top_k=top_k)
 
     if not results:
         st.error("❌ No matching faculty found. Try different keywords.")
@@ -335,7 +325,7 @@ if search_clicked or query:
                         st.markdown(f'<div class="keywords-container">{keywords_html}</div>', unsafe_allow_html=True)
 
                 # ── LLM Explanation ───────────────────────────────────────
-                if show_explanation:
+                if True:
                     explanation = faculty.get("explanation", "")
                     if explanation:
                         st.markdown(f"""
