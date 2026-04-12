@@ -9,3 +9,5 @@ beautifulsoup4
 sentence-transformers
 faiss-cpu
 google-generativeai
+torch
+torchvision

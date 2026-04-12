@@ -42,16 +42,34 @@ from config.settings import (
 # ---------------------------------------------------------------------------
 
 def fetch_data():
-    from config.settings import PROJECT_ROOT
-    csv_path = (
-        PROJECT_ROOT.parent
-        / "DS614-Faculty-Finder"
-        / "data"
-        / "cleaned"
-        / "transformed_faculty_data.csv"
-    )
+    from config.settings import PROJECT_ROOT, DATA_DIR
+    import os
 
-    print(f"[index_builder] Reading faculty data from {csv_path}")
+    # Possible locations for the data file
+    candidates = [
+        # 1. Environment variable override
+        os.getenv("FACULTY_DATA_CSV"),
+        # 2. Sibling folder (Standard project structure)
+        PROJECT_ROOT.parent / "DS614-Faculty-Finder" / "data" / "cleaned" / "transformed_faculty_data.csv",
+        # 3. Local data folder (Container structure)
+        DATA_DIR / "transformed_faculty_data.csv",
+        # 4. Root folder fallback
+        PROJECT_ROOT / "transformed_faculty_data.csv"
+    ]
+
+    csv_path = None
+    for path in candidates:
+        if path and Path(path).exists():
+            csv_path = Path(path)
+            break
+
+    if not csv_path:
+        error_msg = f"Could not find faculty data CSV. Checked: {candidates}"
+        print(f"[index_builder] ❌ Error: {error_msg}")
+        # Return empty list and let build_index fail gracefully or handled accordingly
+        return []
+
+    print(f"[index_builder] 📁 Reading faculty data from: {csv_path}")
     import pandas as pd
 
     df = pd.read_csv(csv_path)

@@ -10,6 +10,21 @@ sys.path.append(str(ROOT))
 from recommender.similarity import get_recommendations
 from recommender.query_parser import parse_query
 from recommender.llm_layer import is_llm_available
+from config.settings import META_FILE, FAISS_INDEX_FILE, INDEX_FILE
+
+# ── Auto-Initialize Index if missing (Critical for fresh Cloud deployments) ──
+def initialize_indices():
+    if not (META_FILE.exists() and FAISS_INDEX_FILE.exists() and INDEX_FILE.exists()):
+        print("[init] 🚀 AI Index files missing. Building them now...")
+        try:
+            from recommender.index_builder import build_all_indices
+            build_all_indices()
+            print("[init] ✅ Indices built successfully.")
+        except Exception as e:
+            st.error(f"Failed to auto-build indices: {e}")
+            print(f"[init] ❌ Error building indices: {e}")
+
+initialize_indices()
 
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
