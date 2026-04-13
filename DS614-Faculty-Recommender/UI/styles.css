@@ -1,39 +1,38 @@
 /* ========================================
-   MIDNIGHT PROFESSIONAL THEME (High-End SaaS Dark Mode)
+   HUMANIZED TERRACOTTA THEME (Warm, Earthy Light Mode)
    ======================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-    /* Midnight Palette */
-    --bg-page: #020617;
-    /* Slate 950 */
-    --bg-card: #0f172a;
-    /* Slate 900 */
-    --primary: #3b82f6;
-    /* Blue 500 */
-    --accent: #8b5cf6;
-    /* Violet 500 */
-    --text-primary: #f8fafc;
-    /* Slate 50 */
-    --text-secondary: #94a3b8;
-    /* Slate 400 */
-    --text-muted: #475569;
-    /* Slate 600 */
-    --border: #1e293b;
-    /* Slate 800 */
-    --border-hover: #334155;
-    /* Slate 700 */
+    /* Earthy Palette */
+    --bg-page: #fdfbf7;
+    /* Soft Warm Paper */
+    --bg-card: #ffffff;
+    /* Clean White */
+    --primary: #e07a5f;
+    /* Warm Terracotta */
+    --accent: #81b29a;
+    /* Soft Sage */
+    --text-primary: #3d405b;
+    /* Soft Dark */
+    --text-secondary: #6b705c;
+    /* Earthy Grey */
+    --text-muted: #a5a58d;
+    /* Light Earthy */
+    --border: #ede4de;
+    /* Soft Warm Border */
+    --border-hover: #e2d4ce;
 
     /* Gradients */
-    --grad-text: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
-    --grad-hero: linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899);
+    --grad-text: linear-gradient(135deg, #e07a5f 0%, #f4a261 100%);
+    --grad-hero: linear-gradient(to right, #e07a5f, #f2cc8f, #81b29a);
 
     /* Shadows & Glows */
-    --glow-primary: rgba(59, 130, 246, 0.15);
-    --shadow-main: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --glow-primary: rgba(224, 122, 95, 0.15);
+    --shadow-main: 0 8px 24px rgba(61, 64, 91, 0.05);
 
-    --radius: 12px;
+    --radius: 16px;
 }
 
 * {
@@ -62,7 +61,7 @@ body {
     text-align: center;
     border-bottom: 1px solid var(--border);
     margin-bottom: 3rem;
-    background: radial-gradient(circle at top, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+    background: radial-gradient(circle at top, rgba(224, 122, 95, 0.06) 0%, transparent 70%);
 }
 
 .hero h1 {
@@ -75,6 +74,7 @@ body {
     justify-content: center;
     gap: 12px;
     animation: fadeInDown 0.8s ease-out;
+    color: var(--text-primary);
 }
 
 .hero h1 .gradient-text {
@@ -98,13 +98,13 @@ body {
    ======================================== */
 
 .stTextInput input {
-    background-color: #0f172a !important;
+    background-color: var(--bg-card) !important;
     border: 1px solid var(--border) !important;
-    border-radius: 12px !important;
-    color: white !important;
+    border-radius: 16px !important;
+    color: var(--text-primary) !important;
     padding: 1rem 1.5rem !important;
     font-size: 1.1rem !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 4px 20px rgba(61, 64, 91, 0.04) !important;
     transition: all 0.3s ease !important;
 }
 
@@ -115,13 +115,13 @@ body {
 }
 
 /* ========================================
-   FACULTY CARD - Professional Glassmorphism
+   FACULTY CARD - Soft & Humanised
    ======================================== */
 
 .faculty-card {
     background-color: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 20px;
+    border-radius: 24px;
     padding: 2rem;
     margin-bottom: 2rem;
     display: flex;
@@ -134,9 +134,9 @@ body {
 }
 
 .faculty-card:hover {
-    transform: translateY(-8px);
-    border-color: var(--primary);
-    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.1);
+    transform: translateY(-4px);
+    border-color: var(--border-hover);
+    box-shadow: 0 20px 40px -15px rgba(61, 64, 91, 0.08), 0 0 20px rgba(224, 122, 95, 0.05);
 }
 
 /* Glow Effect on Hover */
@@ -147,7 +147,7 @@ body {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle at center, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+    background: radial-gradient(circle at center, rgba(224, 122, 95, 0.03) 0%, transparent 50%);
     opacity: 0;
     transition: opacity 0.4s ease;
     pointer-events: none;
@@ -162,14 +162,14 @@ body {
     flex-shrink: 0;
     width: 180px;
     height: 220px;
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
     border: 2px solid var(--border);
     transition: border-color 0.3s;
 }
 
 .faculty-card:hover .avatar-container {
-    border-color: var(--primary);
+    border-color: var(--border-hover);
 }
 
 .avatar-img {
@@ -180,7 +180,7 @@ body {
 }
 
 .faculty-card:hover .avatar-img {
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
 
 /* CONTENT INFO */
@@ -205,11 +205,16 @@ body {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
 }
 
 .rank-badge {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: rgba(224, 122, 95, 0.1);
+    padding: 0.2rem 0.8rem;
+    border-radius: 12px;
 }
 
 /* EMAIL */
@@ -242,7 +247,7 @@ body {
 }
 
 .keyword-tag {
-    background: rgba(30, 41, 59, 0.5);
+    background: rgba(242, 233, 228, 0.4);
     color: var(--text-primary);
     border: 1px solid var(--border);
     padding: 0.4rem 1rem;
@@ -253,8 +258,8 @@ body {
 }
 
 .faculty-card:hover .keyword-tag {
-    border-color: var(--primary);
-    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--border-hover);
+    background: rgba(224, 122, 95, 0.04);
 }
 
 /* SCORE BADGE */
@@ -265,7 +270,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
-    background: rgba(30, 41, 59, 0.3);
+    background: rgba(242, 233, 228, 0.3);
     border-radius: 20px;
     border: 1px solid var(--border);
     min-width: 140px;
@@ -283,7 +288,7 @@ body {
 .score-value {
     font-size: 2.5rem;
     font-weight: 900;
-    color: white;
+    color: var(--text-primary);
 }
 
 .score-bar {
@@ -309,20 +314,20 @@ body {
     background: var(--grad-hero) !important;
     color: white !important;
     border: none !important;
-    border-radius: 12px !important;
+    border-radius: 16px !important;
     padding: 0.8rem 2rem !important;
     font-weight: 700 !important;
     font-size: 1rem !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
-    box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 10px 20px -5px rgba(224, 122, 95, 0.3) !important;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
     width: 100% !important;
 }
 
 .stButton button:hover {
-    transform: scale(1.05) translateY(-2px) !important;
-    box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.6) !important;
+    transform: scale(1.02) translateY(-2px) !important;
+    box-shadow: 0 15px 30px -5px rgba(224, 122, 95, 0.4) !important;
 }
 
 /* Animations */
@@ -331,7 +336,6 @@ body {
         opacity: 0;
         transform: translateY(-20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -343,7 +347,6 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -351,7 +354,7 @@ body {
 }
 
 /* Hide Streamlit Clutter */
-div[data-testid="stVerticalBlock"]>div:has(.faculty-card) {
+div[data-testid="stVerticalBlock"] > div:has(.faculty-card) {
     background: transparent !important;
     padding: 0 !important;
 }

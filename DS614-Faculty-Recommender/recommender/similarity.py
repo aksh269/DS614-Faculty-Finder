@@ -14,9 +14,8 @@ from recommender.preprocessing import preprocess
 from recommender.vectorizer import compute_tf, compute_tfidf
 
 
-# ---------------------------------------------------------------------------
-# Cosine similarity for TF-IDF sparse dicts
-# ---------------------------------------------------------------------------
+# We use a standard cosine similarity to see how much two sets of keywords overlap.
+# This helps us understand if the search query shares exact words with a faculty profile.
 
 def cosine(v1: dict, v2: dict) -> float:
     common = set(v1) & set(v2)
@@ -28,9 +27,8 @@ def cosine(v1: dict, v2: dict) -> float:
     return num / (d1 * d2)
 
 
-# ---------------------------------------------------------------------------
-# Publication-intent detection
-# ---------------------------------------------------------------------------
+# Sometimes, users specifically want to read research papers or journals.
+# Let's set up a few words to help us spot when they are looking for publications.
 
 _PUB_INTENT_KEYWORDS = {
     "publication", "publications", "published", "paper", "papers",
@@ -40,8 +38,8 @@ _PUB_INTENT_KEYWORDS = {
 
 def _has_publication_intent(query: str) -> bool:
     """
-    Returns True if the user's query is specifically asking about publications
-    (e.g. "faculty with many publications in statistics").
+    Check if the user is asking about publications or research papers.
+    For example, if they search "faculty with publications in statistics".
     """
     q_lower = query.lower()
     return any(kw in q_lower for kw in _PUB_INTENT_KEYWORDS)
@@ -49,58 +47,55 @@ def _has_publication_intent(query: str) -> bool:
 
 def _pub_score(row: dict) -> float:
     """
-    Rate how rich a faculty member's publication data is.
-    Returns a multiplier:
-      - 1.2  → has meaningful publication content  (boost)
-      - 0.6  → empty / placeholder publications    (strong penalty)
-    This is ONLY applied when the query has publication intent.
+    Give a gentle boost to faculty profiles that have a solid list of published work.
+    If their publication section is mostly empty, we lower the score a bit, 
+    but only if the user explicitly asked for papers.
     """
     pub = str(row.get("publications", "") or "").strip()
     EMPTY_MARKERS = {"not_available", "n/a", "none", "na", "-", ""}
     if pub.lower() in EMPTY_MARKERS or len(pub) < 10:
-        return 0.6   # penalise: no useful publication data
-    return 1.2       # reward: has actual publication content
+        return 0.6   # Gently penalize since we don't have much to show the user
+    return 1.2       # Boost them slightly because they have the data the user wants
 
 
-# ---------------------------------------------------------------------------
-# Hybrid Search
-# ---------------------------------------------------------------------------
+# The main engine: This carefully blends traditional keyword matching with deep semantic understanding.
+# It brings the best of both worlds to find the right faculty member for the job.
 
 def hybrid_search(query: str, top_k: int = 5) -> list[dict]:
 
-    # ── Load TF-IDF index ────────────────────────────────────────────────
+    # First, let's bring in our simple, fast keyword index.
     with open(INDEX_FILE, "rb") as f:
         tfidf_vectors, tfidf_meta, idf = pickle.load(f)
 
-    # ── Detect publication intent in query ───────────────────────────────
+    # Are they looking for active researchers with publications?
     pub_intent = _has_publication_intent(query)
     if pub_intent:
-        print("[hybrid_search] 📚 Publication intent detected — applying pub score modifier")
+        print("[hybrid_search] The user looks interested in publications. Applying a slight adjustment to highlight active researchers.")
 
-    # ── TF-IDF query vector ───────────────────────────────────────────────
+    # We break down what the user typed into a neat format of weighted keywords.
     tokens = preprocess(query)
     if not tokens:
         return []
     tf    = compute_tf(tokens)
     q_vec = compute_tfidf(tf, idf)
 
-    # ── TF-IDF scores for every faculty (fast, small dataset) ─────────────
+    # Let's quickly score every faculty member on how well their profile matches the exact keywords.
     tfidf_scores = {}
     for i, (vec, row) in enumerate(zip(tfidf_vectors, tfidf_meta)):
         tfidf_scores[i] = cosine(q_vec, vec)
 
-    # ── BERT + FAISS scores ───────────────────────────────────────────────
-    from recommender.embedder import encode_query   # lazy import
+    # Now for the magic: we'll use an AI language model to understand the deeper meaning of the query.
+    from recommender.embedder import encode_query   # We load this just in time to keep things snappy
 
     with open(META_FILE, "rb") as f:
         faiss_meta = pickle.load(f)
 
     faiss_index = faiss.read_index(str(FAISS_INDEX_FILE))
 
-    q_emb = encode_query(query)                     # shape: (384,)
-    q_emb = q_emb.reshape(1, -1)                   # FAISS needs (1, D)
+    q_emb = encode_query(query)                     # Turn the thought into numbers
+    q_emb = q_emb.reshape(1, -1)                   # Prepare it for our similarity search
 
-    # Search top_k*3 so we have enough candidates after merging
+    # We search for a few extra people just to be safe before we merge and rank everyone.
     n_search = min(top_k * 3, faiss_index.ntotal)
     bert_dists, bert_idxs = faiss_index.search(q_emb, n_search)
 
@@ -110,27 +105,30 @@ def hybrid_search(query: str, top_k: int = 5) -> list[dict]:
             bert_scores[int(idx)] = float(max(0.0, score))
 
 
-    # ── Merge scores ──────────────────────────────────────────────────────
-    # Union of indices from both legs
+    # Time to bring both approaches together into a final, beautifully blended score.
     all_indices = set(tfidf_scores.keys()) | set(bert_scores.keys())
 
     combined = []
     for i in all_indices:
         ts = tfidf_scores.get(i, 0.0)
         bs = bert_scores.get(i, 0.0)
+        
+        # We mix the explicit keywords with the deep semantic meaning
         final = HYBRID_ALPHA * ts + HYBRID_BETA * bs
 
-        row = tfidf_meta[i]  # original faculty dict
+        row = tfidf_meta[i]  # Let's look at the actual faculty details
 
-        # ── Publication intent modifier ───────────────────────────────────
+        # Apply the nudge if publications are highly relevant to this query.
         if pub_intent:
             final *= _pub_score(row)
         
-        # Clamp match score to 1.0 (100%)
+        # Make sure our final match score stays within 0 to 100%.
         final = min(1.0, final)
 
         name = row.get("name", "")
         profile_url = row.get("profile_url", "")
+        
+        # If there isn't a direct link, we make a soft attempt to build one dynamically.
         if not profile_url:
             slug = name.lower().replace(" ", "-").replace(".", "")
             profile_url = f"https://www.daiict.ac.in/faculty/{slug}"
@@ -148,13 +146,12 @@ def hybrid_search(query: str, top_k: int = 5) -> list[dict]:
             "score":         round(final, 4),
         })
 
+    # Sort everyone from best match to lowest and return the top choices.
     combined.sort(key=lambda x: x["score"], reverse=True)
     return combined[:top_k]
 
 
-# ---------------------------------------------------------------------------
-# Backwards-compatible wrapper
-# ---------------------------------------------------------------------------
+# A friendly helper function so older parts of the application can still talk to our search engine.
 
 def get_recommendations(query: str, top_k: int = 5) -> list[dict]:
     return hybrid_search(query, top_k)
