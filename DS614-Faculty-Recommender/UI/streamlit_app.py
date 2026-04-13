@@ -60,7 +60,7 @@ st.markdown("""
 /* ── AI Badge ── */
 .ai-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    background: linear-gradient(135deg, #e07a5f, #f4a261);
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
     color: #fff; font-size: 0.72rem; font-weight: 600;
     padding: 3px 10px; border-radius: 20px; letter-spacing: 0.04em;
     margin-bottom: 8px;
@@ -69,8 +69,8 @@ st.markdown("""
 /* ── Expanded keywords pills ── */
 .expanded-tag {
     display: inline-block;
-    background: rgba(224,122,95,0.1); color: #e07a5f;
-    border: 1px solid rgba(224,122,95,0.2);
+    background: rgba(99,102,241,0.15); color: #6366f1;
+    border: 1px solid rgba(99,102,241,0.3);
     font-size: 0.72rem; padding: 2px 9px; border-radius: 20px;
     margin: 2px 3px 2px 0;
 }
@@ -79,35 +79,35 @@ st.markdown("""
 .score-breakdown {
     margin-top: 10px;
     font-size: 0.75rem;
-    color: #6b705c;
-    background: rgba(61, 64, 91, 0.03);
+    color: #94a3b8;
+    background: rgba(255,255,255,0.03);
     padding: 6px 10px;
     border-radius: 6px;
-    border: 1px solid rgba(61, 64, 91, 0.05);
+    border: 1px solid rgba(255,255,255,0.05);
 }
-.score-breakdown span { color: #e07a5f; font-weight: 700; }
+.score-breakdown span { color: #818cf8; font-weight: 700; }
 
 /* ── LLM explanation box ── */
 .explanation-box {
-    background: rgba(129,178,154,0.1);
-    border-left: 3px solid #81b29a;
+    background: rgba(99,102,241,0.08);
+    border-left: 3px solid #6366f1;
     border-radius: 6px;
     padding: 10px 14px;
     margin-top: 12px;
     font-size: 0.85rem;
-    color: #3d405b;
+    color: #cbd5e1;
     line-height: 1.5;
 }
 .explanation-label {
-    font-size: 0.7rem; font-weight: 700; color: #81b29a;
+    font-size: 0.7rem; font-weight: 700; color: #818cf8;
     letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px;
 }
 
 /* ── Search mode chip ── */
 .mode-chip {
     display:inline-flex; align-items:center; gap:5px;
-    background: rgba(129,178,154,0.15); color:#6b705c;
-    border:1px solid rgba(129,178,154,0.3);
+    background: rgba(16,185,129,0.15); color:#34d399;
+    border:1px solid rgba(52,211,153,0.3);
     font-size:0.73rem; font-weight:600; padding:3px 10px;
     border-radius:20px; margin-left:10px;
 }
@@ -121,7 +121,7 @@ st.markdown("""
 def get_faculty_photo(name, profile_url):
     """Scrape faculty photo from DAIICT profile page, fallback to avatar."""
     if not profile_url or profile_url == "-":
-        return f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=200&background=e07a5f&color=fff&bold=true"
+        return f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=200&background=3b82f6&color=fff&bold=true"
     try:
         response = requests.get(profile_url, timeout=5)
         if response.status_code == 200:
@@ -143,7 +143,7 @@ def get_faculty_photo(name, profile_url):
                 return img_url
     except Exception:
         pass
-    return f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=200&background=e07a5f&color=fff&bold=true"
+    return f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=200&background=3b82f6&color=fff&bold=true"
 
 
 def extract_keywords(text, max_keywords=8):

@@ -1,38 +1,39 @@
 /* ========================================
-   HUMANIZED WARM DARK THEME (Eye-Friendly, Earthy)
+   MIDNIGHT PROFESSIONAL THEME (High-End SaaS Dark Mode)
    ======================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-    /* Earthy Dark Palette (Relieves eye strain) */
-    --bg-page: #1c1a19;
-    /* Deep warm charcoal */
-    --bg-card: #262422;
-    /* Soft dark card background */
-    --primary: #d67b63;
-    /* Muted warm terracotta */
-    --accent: #7fa48f;
-    /* Muted sage green */
-    --text-primary: #ebd9c8;
-    /* Soft cream/beige for text (not harsh white) */
-    --text-secondary: #ad9a8a;
-    /* Earthy sand */
-    --text-muted: #807368;
-    /* Deep soft brown-gray */
-    --border: #3d3936;
-    /* Soft border */
-    --border-hover: #4f4a46;
+    /* Midnight Palette */
+    --bg-page: #020617;
+    /* Slate 950 */
+    --bg-card: #0f172a;
+    /* Slate 900 */
+    --primary: #3b82f6;
+    /* Blue 500 */
+    --accent: #8b5cf6;
+    /* Violet 500 */
+    --text-primary: #f8fafc;
+    /* Slate 50 */
+    --text-secondary: #94a3b8;
+    /* Slate 400 */
+    --text-muted: #475569;
+    /* Slate 600 */
+    --border: #1e293b;
+    /* Slate 800 */
+    --border-hover: #334155;
+    /* Slate 700 */
 
     /* Gradients */
-    --grad-text: linear-gradient(135deg, #d67b63 0%, #e6a87c 100%);
-    --grad-hero: linear-gradient(to right, #d67b63, #d9aa75, #7fa48f);
+    --grad-text: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+    --grad-hero: linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899);
 
     /* Shadows & Glows */
-    --glow-primary: rgba(214, 123, 99, 0.15);
-    --shadow-main: 0 8px 24px rgba(0, 0, 0, 0.2);
+    --glow-primary: rgba(59, 130, 246, 0.15);
+    --shadow-main: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 
-    --radius: 16px;
+    --radius: 12px;
 }
 
 * {
@@ -61,7 +62,7 @@ body {
     text-align: center;
     border-bottom: 1px solid var(--border);
     margin-bottom: 3rem;
-    background: radial-gradient(circle at top, rgba(214, 123, 99, 0.08) 0%, transparent 70%);
+    background: radial-gradient(circle at top, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
 }
 
 .hero h1 {
@@ -94,18 +95,18 @@ body {
 }
 
 /* ========================================
-   SEARCH INPUT (Fixed Visibility Issue)
+   SEARCH INPUT
    ======================================== */
 
 .stTextInput input {
-    background-color: var(--bg-card) !important;
+    background-color: #0f172a !important;
     border: 1px solid var(--border) !important;
-    border-radius: 16px !important;
-    color: #ebd9c8 !important; /* Force text color to soft cream */
-    caret-color: #d67b63 !important; /* Make cursor visible with primary color */
+    border-radius: 12px !important;
+    color: #f8fafc !important; /* Fixed text color */
+    caret-color: #3b82f6 !important; /* Visible cursor fix */
     padding: 1rem 1.5rem !important;
     font-size: 1.1rem !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
     transition: all 0.3s ease !important;
 }
 
@@ -121,13 +122,13 @@ body {
 }
 
 /* ========================================
-   FACULTY CARD - Soft Warm Dark
+   FACULTY CARD - Professional Glassmorphism
    ======================================== */
 
 .faculty-card {
     background-color: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 24px;
+    border-radius: 20px;
     padding: 2rem;
     margin-bottom: 2rem;
     display: flex;
@@ -140,9 +141,9 @@ body {
 }
 
 .faculty-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--border-hover);
-    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4), 0 0 20px rgba(214, 123, 99, 0.05);
+    transform: translateY(-8px);
+    border-color: var(--primary);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.1);
 }
 
 /* Glow Effect on Hover */
@@ -153,7 +154,7 @@ body {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle at center, rgba(214, 123, 99, 0.04) 0%, transparent 50%);
+    background: radial-gradient(circle at center, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
     opacity: 0;
     transition: opacity 0.4s ease;
     pointer-events: none;
@@ -168,14 +169,14 @@ body {
     flex-shrink: 0;
     width: 180px;
     height: 220px;
-    border-radius: 20px;
+    border-radius: 16px;
     overflow: hidden;
     border: 2px solid var(--border);
     transition: border-color 0.3s;
 }
 
 .faculty-card:hover .avatar-container {
-    border-color: var(--border-hover);
+    border-color: var(--primary);
 }
 
 .avatar-img {
@@ -186,7 +187,7 @@ body {
 }
 
 .faculty-card:hover .avatar-img {
-    transform: scale(1.03);
+    transform: scale(1.05);
 }
 
 /* CONTENT INFO */
@@ -211,16 +212,11 @@ body {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
 }
 
 .rank-badge {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--primary);
-    background: rgba(214, 123, 99, 0.15);
-    padding: 0.2rem 0.8rem;
-    border-radius: 12px;
+    font-size: 1.5rem;
 }
 
 /* EMAIL */
@@ -253,7 +249,7 @@ body {
 }
 
 .keyword-tag {
-    background: rgba(43, 40, 38, 0.8);
+    background: rgba(30, 41, 59, 0.5);
     color: var(--text-primary);
     border: 1px solid var(--border);
     padding: 0.4rem 1rem;
@@ -264,8 +260,8 @@ body {
 }
 
 .faculty-card:hover .keyword-tag {
-    border-color: var(--border-hover);
-    background: rgba(214, 123, 99, 0.08);
+    border-color: var(--primary);
+    background: rgba(59, 130, 246, 0.1);
 }
 
 /* SCORE BADGE */
@@ -276,7 +272,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(30, 41, 59, 0.3);
     border-radius: 20px;
     border: 1px solid var(--border);
     min-width: 140px;
@@ -294,7 +290,7 @@ body {
 .score-value {
     font-size: 2.5rem;
     font-weight: 900;
-    color: var(--text-primary);
+    color: white;
 }
 
 .score-bar {
@@ -318,22 +314,22 @@ body {
 
 .stButton button {
     background: var(--grad-hero) !important;
-    color: #1c1a19 !important; /* Dark text on button for better contrast! */
+    color: white !important;
     border: none !important;
-    border-radius: 16px !important;
+    border-radius: 12px !important;
     padding: 0.8rem 2rem !important;
-    font-weight: 800 !important;
+    font-weight: 700 !important;
     font-size: 1rem !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
-    box-shadow: 0 10px 20px -5px rgba(214, 123, 99, 0.3) !important;
+    box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4) !important;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
     width: 100% !important;
 }
 
 .stButton button:hover {
-    transform: scale(1.02) translateY(-2px) !important;
-    box-shadow: 0 15px 30px -5px rgba(214, 123, 99, 0.4) !important;
+    transform: scale(1.05) translateY(-2px) !important;
+    box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.6) !important;
 }
 
 /* Animations */
@@ -342,6 +338,7 @@ body {
         opacity: 0;
         transform: translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -353,6 +350,7 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -360,7 +358,7 @@ body {
 }
 
 /* Hide Streamlit Clutter */
-div[data-testid="stVerticalBlock"] > div:has(.faculty-card) {
+div[data-testid="stVerticalBlock"]>div:has(.faculty-card) {
     background: transparent !important;
     padding: 0 !important;
 }
