@@ -1,6 +1,6 @@
 # DS614 - Big Data Engineering Project: ScholarMatch
 
-**Live Deployment:** [https://ds614-faculty-finder-the-data-engineers.streamlit.app](https://ds614-faculty-finder-the-data-engineers.streamlit.app)
+**Live Deployment:** [https://scholar-match-ai.streamlit.app/](https://scholar-match-ai.streamlit.app/)
 
 ---
 
@@ -58,7 +58,7 @@ docker run -p 8501:8501 scholar-match
 
 ## Deployment
 
-The application is deployed on Railway and is accessible publicly for demonstration:
+The application is deployed on Streamlit and is accessible publicly for demonstration:
 👉 **[ScholarMatch Production App](https://ds614-faculty-finder-production.up.railway.app)**
 
 ---
